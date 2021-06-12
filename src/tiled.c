@@ -6,6 +6,23 @@
 
 #define FILE_BUFFER_SIZE 100
 
+#define SET_VARS()                                                                                 \
+	size_t initial_x = screen_rect.pos.x / tiled->tile_size.width;                                 \
+	size_t initial_y = screen_rect.pos.y / tiled->tile_size.height;                                \
+	size_t final_x = ((screen_rect.pos.x + screen_rect.size.width) / tiled->tile_size.width) + 1;  \
+	size_t final_y = ((screen_rect.pos.y + screen_rect.size.height) / tiled->tile_size.height) + 1;
+
+#define BEGIN_LOOP()                                                                               \
+	for (size_t y = initial_y; y < final_y; y++) {                                                 \
+		for (size_t x = initial_x; x < final_x; x++) {                                             \
+			size_t tile = (y * (int)tiled->map_size.width) + x;                                    \
+			if (tiled->map[tile] == -1)                                                            \
+				continue;
+
+#define END_LOOP()                                                                                 \
+	}                                                                                              \
+	}
+
 // Init a Tiled map
 Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, Size map_size,
 				  Size tile_size) {
@@ -39,22 +56,34 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 	return tiled_map;
 }
 
-// Render a Tiled map
 void tiled_render(display_context_t disp, Tiled *tiled, Rect screen_rect) {
-	size_t initial_x = screen_rect.pos.x / tiled->tile_size.width;
-	size_t initial_y = screen_rect.pos.y / tiled->tile_size.height;
-	size_t final_x = ((screen_rect.pos.x + screen_rect.size.width) / tiled->tile_size.width) + 1;
-	size_t final_y = ((screen_rect.pos.y + screen_rect.size.height) / tiled->tile_size.height) + 1;
+	SET_VARS()
 
-	for (size_t y = initial_y; y < final_y; y++) {
-		for (size_t x = initial_x; x < final_x; x++) {
-			size_t tile = (y * (int)tiled->map_size.width) + x;
-			if (tiled->map[tile] == -1)
-				continue;
+	BEGIN_LOOP()
 
-			graphics_draw_sprite_trans_stride(disp, x * tiled->tile_size.width,
-											  y * tiled->tile_size.height, tiled->sprite,
-											  tiled->map[tile]);
-		}
+	graphics_draw_sprite_trans_stride(disp, x * tiled->tile_size.width, y * tiled->tile_size.height,
+									  tiled->sprite, tiled->map[tile]);
+
+	END_LOOP()
+}
+
+void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
+	rdp_sync(SYNC_PIPE);
+	SET_VARS()
+
+	int last_tile = -1;
+
+	BEGIN_LOOP()
+
+	if (last_tile != tiled->map[tile]) {
+		last_tile = tiled->map[tile];
+		rdp_load_texture_stride(0, 0, MIRROR_DISABLED, tiled->sprite, tiled->map[tile]);
 	}
+
+	rdp_draw_textured_rectangle(0, x * tiled->tile_size.width, y * tiled->tile_size.height,
+								x * tiled->tile_size.width + tiled->tile_size.width,
+								y * tiled->tile_size.height + tiled->tile_size.height,
+								MIRROR_DISABLED);
+
+	END_LOOP()
 }
