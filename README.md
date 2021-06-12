@@ -46,7 +46,7 @@ bool contains(Rect inner, Rect outer);
 ```
 
 ### Sprite Batch
-> sprite_batch.h
+> sprite_batch.h | sprite_batch.c
 
 Used to quickly draw the same sprite on multiple positions at the same time.
 
@@ -70,7 +70,7 @@ sprite_batch_draw(batch, current_frame, screen_rect);
 ```
 
 ### Animated Sprite
-> animated_sprite.h
+> animated_sprite.h | animated_sprite.c
 
 Used to animate and draw a sprite.
 
@@ -92,7 +92,7 @@ animated_sprite_draw(anim, new_pos(10, 10), screen_rect);
 ```
 
 ### Memory Pool
-> mem_pool.h
+> mem_pool.h | mem_pool.c
 
 Simple memory pool to allocate/free memory during gameplay without causing malloc (slower) calls.
 
@@ -112,6 +112,25 @@ mem_zone_free_all(&memory_pool);
 // gets another int, but on the same memory space as before
 // if no value is set it will be the same set previously (on this example, '1')
 int value2 = mem_zone_alloc(&memory_pool, sizeof(int));
+```
+
+### Tiled Support
+> tiled.h | tiled.c
+
+Tiled support is still not as performant due to the way the N64 works and how Libdragon works, but can work for fewer tiles and textures.
+
+It uses software rendering, as it was the most performant on the use cases I tested (mostly due to the amount of texture swapping that happens).
+
+The maximum map size I was able to load was 50x50, so take that into consideration as well.
+
+```c
+// load the map
+Size grid_size = new_size(50, 50); // map tiles: 50x50
+Size tile_size = new_size_same(16); // tile size: 16x16
+Tiled *tile_test = tiled_init(&memory_pool, tile_sprite, "/path/to/map.map", grid_size, tile_size);
+
+// Render the map
+tiled_render(disp, tile_test, screen_rect);
 ```
 
 ## Development
