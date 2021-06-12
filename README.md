@@ -132,6 +132,8 @@ int value2 = mem_zone_alloc(&memory_pool, sizeof(int));
 
 Tiled support is still not as performant due to the way the N64 works and how Libdragon works, but can work for fewer tiles and textures.
 
+It has support for Tiled CSV files, and you can use those directly, just make sure you import it using `mkdfs`.
+
 It comes in two variants.
 
 > tiled.h | tiled.c
