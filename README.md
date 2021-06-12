@@ -113,7 +113,7 @@ Simple memory pool to allocate/free memory during gameplay without causing mallo
 ```c
 MemZone memory_pool;
 
-// allocating 1MB to be used
+// allocating 1KB to be used
 mem_zone_init(&memory_pool, 1 * 1024);
 
 // gets one int from the pool
