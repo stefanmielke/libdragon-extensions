@@ -12,6 +12,7 @@ typedef struct {
 } Tiled;
 
 // Init a Tiled map
+// On my tests, you can load a map with around 2_500 (50x50) tiles before an error occurs
 Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, Size map_size,
 				  Size tile_size);
 

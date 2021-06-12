@@ -22,7 +22,7 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 	const char *tok;
 	int fp = dfs_open(map_path);
 
-	char buffer[dfs_size(fp)];
+	char *buffer = malloc(dfs_size(fp));
 	int bytes_read;
 	size_t i = 0;
 	while ((bytes_read = dfs_read(buffer, sizeof(char), dfs_size(fp), fp)) > 0 &&
@@ -33,6 +33,7 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 		}
 	}
 
+	free(buffer);
 	dfs_close(fp);
 
 	return tiled_map;
