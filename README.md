@@ -167,7 +167,7 @@ It will consume more memory, and will take more time to init, and also doesn't h
 // load the map
 Size grid_size = new_size(50, 50); // map tiles: 50x50
 Size tile_size = new_size_same(16); // tile size: 16x16
-Tiled *tile_test = tiled_cached_init(&memory_pool, tile_sprite, "/path/to/map.map", grid_size, tile_size);
+TiledCached *tile_test = tiled_cached_init(&memory_pool, tile_sprite, "/path/to/map.map", grid_size, tile_size);
 
 // Render the map
 tiled_cached_render(tile_test, screen_rect);
