@@ -17,6 +17,20 @@ Position new_position_same(float x_and_y);
 Position new_position(float x, float y);
 ```
 
+### PositionInt
+> position_int.h
+
+```c
+typedef struct {
+	int x;
+	int y;
+} PositionInt;
+
+Position new_position_int_zero();
+Position new_position_int_same(int x_and_y);
+Position new_position_int(int x, int y);
+```
+
 ### Size
 >size.h
 
@@ -115,11 +129,18 @@ int value2 = mem_zone_alloc(&memory_pool, sizeof(int));
 ```
 
 ### Tiled Support
-> tiled.h | tiled.c
 
 Tiled support is still not as performant due to the way the N64 works and how Libdragon works, but can work for fewer tiles and textures.
 
-It uses software rendering, as it was the most performant on the use cases I tested (mostly due to the amount of texture swapping that happens).
+It comes in two variants.
+
+> tiled.h | tiled.c
+
+This variant is the simple one, rendering left to right / top to bottom, can use software and hardware rendering according to your needs, and has culling.
+
+The software renderer is recommended for maps with lots of texture swaps during rendering, as it provides constant time to render.
+
+The hardware rendering is preffered when there's not much texture swapping and can render maps faster than the software renderer if that's the case.
 
 The maximum map size I was able to load was 50x50, so take that into consideration as well.
 
@@ -129,8 +150,27 @@ Size grid_size = new_size(50, 50); // map tiles: 50x50
 Size tile_size = new_size_same(16); // tile size: 16x16
 Tiled *tile_test = tiled_init(&memory_pool, tile_sprite, "/path/to/map.map", grid_size, tile_size);
 
-// Render the map
+// Render the map (software renderer)
 tiled_render(disp, tile_test, screen_rect);
+
+// Render the map (hardware renderer)
+tiled_render_rdp(tile_test, screen_rect);
+```
+
+> tiled_cached.h | tiled_cached.c
+
+This variant can perform really well even if you have more than a few different textures, due to its caching, that tries to prevent texture swaps as much as it can.
+
+It will consume more memory, and will take more time to init, and also doesn't have culling implemented.
+
+```c
+// load the map
+Size grid_size = new_size(50, 50); // map tiles: 50x50
+Size tile_size = new_size_same(16); // tile size: 16x16
+Tiled *tile_test = tiled_cached_init(&memory_pool, tile_sprite, "/path/to/map.map", grid_size, tile_size);
+
+// Render the map
+tiled_cached_render(tile_test, screen_rect);
 ```
 
 ## Development
