@@ -59,6 +59,16 @@ bool is_intersecting(Rect a, Rect b);
 bool contains(Rect inner, Rect outer);
 ```
 
+### Spritesheet Support
+> spritesheet.h
+
+Libdragon supports spritesheet out of the box, so here we only have support methods to ease loading them (and to use our memory pool).
+
+```c
+// load spritesheet
+sprite_t *my_sprite = load_spritesheet(&memory_pool, "/path/to/sprite.sprite");
+```
+
 ### Sprite Batch
 > sprite_batch.h | sprite_batch.c
 
