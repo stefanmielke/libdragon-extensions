@@ -41,8 +41,13 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 
 // Render a Tiled map
 void tiled_render(display_context_t disp, Tiled *tiled, Rect screen_rect) {
-	for (size_t y = 0; y < tiled->map_size.height; y++) {
-		for (size_t x = 0; x < tiled->map_size.width; x++) {
+	size_t initial_x = screen_rect.pos.x / tiled->tile_size.width;
+	size_t initial_y = screen_rect.pos.y / tiled->tile_size.height;
+	size_t final_x = ((screen_rect.pos.x + screen_rect.size.width) / tiled->tile_size.width) + 1;
+	size_t final_y = ((screen_rect.pos.y + screen_rect.size.height) / tiled->tile_size.height) + 1;
+
+	for (size_t y = initial_y; y < final_y; y++) {
+		for (size_t x = initial_x; x < final_x; x++) {
 			size_t tile = (y * (int)tiled->map_size.width) + x;
 			if (tiled->map[tile] == -1)
 				continue;
