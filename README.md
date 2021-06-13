@@ -1,6 +1,10 @@
 # Libdragon Extensions
 List of structs and functions to help on Libdragon development.
 
+## Installation
+
+You can either [download the code from GitHub](https://github.com/stefanmielke/libdragon-extensions/archive/refs/heads/main.zip) into your project, or [clone the repo](https://github.com/stefanmielke/libdragon-extensions.git) inside your project as a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) (so you can use `git pull` to get the latest changes when needed).
+
 ## Extensions Available
 
 ### Position
@@ -184,6 +188,69 @@ TiledCached *tile_test = tiled_cached_init(&memory_pool, tile_sprite, "/path/to/
 // Render the map
 tiled_cached_render(tile_test, screen_rect);
 ```
+
+### Scene Manager
+
+You can use this to manage the transition across different scenes (aka levels).
+
+This allows you to create different files that can represent your scenes and just create callbacks that will be used by the Scene Manager.
+
+```c
+// callbacks for a scene
+void main_screen_create();
+short main_screen_tick();
+void main_screen_display(display_context_t disp);
+void main_screen_destroy()
+
+// callback for changing scenes
+enum screens {
+	SCREEN_MAIN
+};
+void change_screen(short curr_screen, short next_screen) {
+	switch (next_screen) {
+		case SCREEN_MAIN:
+			scene_manager_set_callbacks(scene_manager, &main_screen_create, &main_screen_tick,
+										&main_screen_display, &main_screen_destroy);
+			break;
+		default:
+			abort();
+	}
+}
+
+// 3 ways to initialize scene manager
+
+// 1. I have a global and scene memory pools
+SceneManager *scene_manager = scene_manager_init(&global_memory_pool, &memory_pool, &change_screen);
+// 2. I use malloc or global vars for globals
+SceneManager *scene_manager = scene_manager_init(NULL, &memory_pool, &change_screen);
+// 3. I want to manage my memory pools myself
+SceneManager *scene_manager = scene_manager_init(NULL, NULL, &change_screen);
+
+// set up first screen after initializing
+scene_manager_change_scene(scene_manager, SCREEN_MAIN);
+
+// call tick every frame after controller_scan
+scene_manager_tick(scene_manager);
+
+// call every tick to draw to the screen after display_lock
+scene_manager_display(scene_manager, disp);
+
+// you can call this method at any time during screen tick to set up screen change
+// it will only really change the scene at the beggining of the next tick
+scene_manager_change_scene(scene_manager, SCREEN_PLAY);
+
+// you can check if the game will change on the next tick using this check after `scene_manager_tick`
+if (scene_manager->current_scene_id != scene_manager->next_scene_id) {
+	// Screen will change! Draw loading screen like below instead of calling `scene_manager_display`?
+	graphics_fill_screen(disp, BLACK);
+	graphics_set_color(WHITE, BLACK);
+	graphics_draw_text(disp, 0, 0, "Loading...");
+}
+```
+
+## More Examples
+
+I'm trying to test and use this code on [my game](https://github.com/stefanmielke/mielkesparty_n64). So feel free to look there for more examples.
 
 ## Development
 
