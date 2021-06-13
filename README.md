@@ -325,6 +325,7 @@ void tween_player_x(void *target_object, float current_value) {
 	player->x = current_value;
 }
 void tween_player_size(void *target_object, Size current_value);
+void tween_player_position(void *target_object, Position current_value);
 // example callback for when the tween finishes
 void tween_finished_player_x(void *target_object);
 
@@ -355,7 +356,10 @@ float start_x = 50, end_x = 200;
 tween_set_to_float(tween, start_x, end_x, &tween_player_x);
 // size tween
 Size start_size = new_size_same(1), end_size = new_size_same(4);
-tween_set_to_size(tween, start_x, end_x, &tween_player_size);
+tween_set_to_size(tween, start_size, end_size, &tween_player_size);
+// position tween
+Position start_position = new_position(10, 100), end_position = new_position(10, 300);
+tween_set_to_position(tween, start_position, end_position, &tween_player_position);
 
 // calling tick every frame. It will call 'tween_player_x' with the new value, and 'tween_finished_player_x' when it finishes
 tween_tick(tween);

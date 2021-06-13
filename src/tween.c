@@ -10,6 +10,9 @@ void tween_float_swap(Tween *tween);
 void tween_size_tick(Tween *tween, float tick_diff);
 void tween_size_swap(Tween *tween);
 
+void tween_position_tick(Tween *tween, float tick_diff);
+void tween_position_swap(Tween *tween);
+
 Tween *tween_init(MemZone *memory_pool) {
 	Tween *tween = MEM_ALLOC(sizeof(Tween), memory_pool);
 	tween->allocator = memory_pool;
@@ -46,6 +49,9 @@ void tween_tick(Tween *tween) {
 		case TWEEN_SIZE:
 			tween_size_tick(tween, tick_diff);
 			break;
+		case TWEEN_POSITION:
+			tween_position_tick(tween, tick_diff);
+			break;
 		default:
 			break;
 	}
@@ -69,6 +75,9 @@ void tween_tick(Tween *tween) {
 					break;
 				case TWEEN_SIZE:
 					tween_size_swap(tween);
+					break;
+				case TWEEN_POSITION:
+					tween_position_swap(tween);
 					break;
 				default:
 					break;
@@ -172,4 +181,43 @@ void tween_size_swap(Tween *tween) {
 	values->end_value = start_value;
 	values->value_diff.width = values->end_value.width - values->start_value.width;
 	values->value_diff.height = values->end_value.height - values->start_value.height;
+}
+
+// Tween Position
+
+typedef struct {
+	Position start_value;
+	Position end_value;
+	Position value_diff;
+	fnTWCallbackPosition tween_callback;
+} TweenValuesPosition;
+
+void tween_set_to_position(Tween *tween, Position start_value, Position end_value,
+						   fnTWCallbackPosition tween_callback) {
+	tween->type = TWEEN_POSITION;
+
+	TweenValuesPosition *values = MEM_ALLOC(sizeof(TweenValuesPosition), tween->allocator);
+	values->start_value = start_value;
+	values->end_value = end_value;
+	values->value_diff.x = values->end_value.x - values->start_value.x;
+	values->value_diff.y = values->end_value.y - values->start_value.y;
+	values->tween_callback = tween_callback;
+
+	tween->tween_values = values;
+}
+
+void tween_position_tick(Tween *tween, float tick_diff) {
+	TweenValuesPosition *values = tween->tween_values;
+	float next_value_x = (tick_diff * values->value_diff.x) + values->start_value.x;
+	float next_value_y = (tick_diff * values->value_diff.y) + values->start_value.y;
+	values->tween_callback(tween->target_object, new_position(next_value_x, next_value_y));
+}
+
+void tween_position_swap(Tween *tween) {
+	TweenValuesPosition *values = tween->tween_values;
+	Position start_value = values->start_value;
+	values->start_value = values->end_value;
+	values->end_value = start_value;
+	values->value_diff.x = values->end_value.x - values->start_value.x;
+	values->value_diff.y = values->end_value.y - values->start_value.y;
 }

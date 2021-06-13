@@ -3,12 +3,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "mem_pool.h"
+#include "position.h"
 #include "size.h"
 
 /**
  * @brief Enum with the types of Tweens available.
  */
-typedef enum { TWEEN_NONE, TWEEN_FLOAT, TWEEN_SIZE } TweenType;
+typedef enum { TWEEN_NONE, TWEEN_FLOAT, TWEEN_SIZE, TWEEN_POSITION } TweenType;
 
 /**
  * @brief Easing function callback. See 'easing.h' for functions.
@@ -42,6 +43,16 @@ typedef void (*fnTWCallbackFloat)(void *target_object, float current_value);
  *            Current float value based on the easing function.
  */
 typedef void (*fnTWCallbackSize)(void *target_object, Size current_value);
+
+/**
+ * @brief Callback for TWEEN_POSITION.
+ *
+ * @param[in] target_object
+ *            Object sent on 'tween_init'.
+ * @param[in] current_value
+ *            Current float value based on the easing function.
+ */
+typedef void (*fnTWCallbackPosition)(void *target_object, Position current_value);
 
 /**
  * @brief Struct for the Tween
@@ -153,7 +164,23 @@ void tween_set_to_float(Tween *tween, float start_value, float end_value,
  *        End value for the easing.
  * @param tween_callback
  *        Callback that will be called on 'tween_tick' with the update value. (eg.: void
- * tween_callback(void *target_object, float current_value))
+ * tween_callback(void *target_object, Size current_value))
  */
 void tween_set_to_size(Tween *tween, Size start_value, Size end_value,
 					   fnTWCallbackSize tween_callback);
+
+/**
+ * @brief Allocates and start the Tween to update a Position value.
+ *
+ * @param tween
+ *        Tween already initialized that should be used.
+ * @param start_value
+ *        Starting value for the easing.
+ * @param end_value
+ *        End value for the easing.
+ * @param tween_callback
+ *        Callback that will be called on 'tween_tick' with the update value. (eg.: void
+ * tween_callback(void *target_object, Position current_value))
+ */
+void tween_set_to_position(Tween *tween, Position start_value, Position end_value,
+						   fnTWCallbackPosition tween_callback);
