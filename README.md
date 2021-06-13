@@ -69,8 +69,13 @@ bool contains(Rect inner, Rect outer);
 Libdragon supports spritesheet out of the box, so here we only have support methods to ease loading them (and to use our memory pool).
 
 ```c
-// load spritesheet
-sprite_t *my_sprite = load_spritesheet(&memory_pool, "/path/to/sprite.sprite");
+// load spritesheet using a memory pool
+sprite_t *my_sprite = spritesheet_load(&memory_pool, "/path/to/sprite.sprite");
+
+// load spritesheet with no memory pool
+sprite_t *my_sprite = spritesheet_load(NULL, "/path/to/sprite.sprite");
+// remember to free the sprite if not using a memory pool!
+free(my_sprite);
 ```
 
 ### Sprite Batch
