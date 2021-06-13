@@ -118,3 +118,12 @@ void scene_manager_tick(SceneManager *scene_manager);
  *            The main display context.
  */
 void scene_manager_display(SceneManager *scene_manager, display_context_t disp);
+
+/**
+ * @brief Frees up space allocated on the SceneManager. Should only be called if not using a
+ * 'global_memory_pool'.
+ *
+ * @param scene_manager
+ *        SceneManager to destroy.
+ */
+void scene_manager_destroy(SceneManager *scene_manager);

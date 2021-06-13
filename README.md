@@ -251,6 +251,9 @@ if (scene_manager->current_scene_id != scene_manager->next_scene_id) {
 	graphics_set_color(WHITE, BLACK);
 	graphics_draw_text(disp, 0, 0, "Loading...");
 }
+
+// destroy the scene manager if not using a global memory pool
+scene_manager_destroy(scene_manager);
 ```
 
 ## More Examples

@@ -57,3 +57,7 @@ void scene_manager_tick(SceneManager *scene_manager) {
 void scene_manager_display(SceneManager *scene_manager, display_context_t disp) {
 	scene_manager->scene_callbacks.display(disp);
 }
+
+void scene_manager_destroy(SceneManager *scene_manager) {
+	free(scene_manager);
+}
