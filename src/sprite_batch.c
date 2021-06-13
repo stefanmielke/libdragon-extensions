@@ -1,17 +1,10 @@
 #include "../include/sprite_batch.h"
+#include "../include/memory_alloc.h"
 
 SpriteBatch *sprite_batch_init(MemZone *memory_pool, sprite_t *sprite, size_t qty, Size size,
 							   Position render_offset) {
-	SpriteBatch *batch = NULL;
-	batch->positions = NULL;
-
-	if (memory_pool) {
-		batch = mem_zone_alloc(memory_pool, sizeof(SpriteBatch));
-		batch->positions = mem_zone_alloc(memory_pool, sizeof(Position) * qty);
-	} else {
-		batch = malloc(sizeof(SpriteBatch));
-		batch->positions = malloc(sizeof(Position) * qty);
-	}
+	SpriteBatch *batch = MEM_ALLOC(sizeof(SpriteBatch), memory_pool);
+	batch->positions = MEM_ALLOC(sizeof(Position) * qty, memory_pool);
 	batch->sprite = sprite;
 	batch->qty = qty;
 	batch->size = size;
