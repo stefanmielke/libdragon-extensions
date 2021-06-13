@@ -7,6 +7,9 @@
 void tween_float_tick(Tween *tween, float tick_diff);
 void tween_float_swap(Tween *tween);
 
+void tween_size_tick(Tween *tween, float tick_diff);
+void tween_size_swap(Tween *tween);
+
 Tween *tween_init(MemZone *memory_pool) {
 	Tween *tween = MEM_ALLOC(sizeof(Tween), memory_pool);
 	tween->allocator = memory_pool;
@@ -40,6 +43,9 @@ void tween_tick(Tween *tween) {
 		case TWEEN_FLOAT:
 			tween_float_tick(tween, tick_diff);
 			break;
+		case TWEEN_SIZE:
+			tween_size_tick(tween, tick_diff);
+			break;
 		default:
 			break;
 	}
@@ -61,6 +67,9 @@ void tween_tick(Tween *tween) {
 				case TWEEN_FLOAT:
 					tween_float_swap(tween);
 					break;
+				case TWEEN_SIZE:
+					tween_size_swap(tween);
+					break;
 				default:
 					break;
 			}
@@ -77,7 +86,7 @@ void tween_tick(Tween *tween) {
 void tween_start(Tween *tween, void *target_object, fnTWEasingFunction easing_function,
 				 uint64_t duration_in_ms, fnTWCallbackEnding tween_ending, bool auto_reverse,
 				 bool always_repeat) {
-	tween->type = TWEEN_FLOAT;
+	tween->type = TWEEN_NONE;
 	tween->target_object = target_object;
 	tween->easing_function = easing_function;
 	tween->finished = false;
@@ -101,6 +110,8 @@ typedef struct {
 
 void tween_set_to_float(Tween *tween, float start_value, float end_value,
 						fnTWCallbackFloat tween_callback) {
+	tween->type = TWEEN_FLOAT;
+
 	TweenValuesFloat *values = MEM_ALLOC(sizeof(TweenValuesFloat), tween->allocator);
 	values->start_value = start_value;
 	values->end_value = end_value;
@@ -122,4 +133,43 @@ void tween_float_swap(Tween *tween) {
 	values->start_value = values->end_value;
 	values->end_value = start_value;
 	values->value_diff = values->end_value - values->start_value;
+}
+
+// Tween Size
+
+typedef struct {
+	Size start_value;
+	Size end_value;
+	Size value_diff;
+	fnTWCallbackSize tween_callback;
+} TweenValuesSize;
+
+void tween_set_to_size(Tween *tween, Size start_value, Size end_value,
+					   fnTWCallbackSize tween_callback) {
+	tween->type = TWEEN_SIZE;
+
+	TweenValuesSize *values = MEM_ALLOC(sizeof(TweenValuesSize), tween->allocator);
+	values->start_value = start_value;
+	values->end_value = end_value;
+	values->value_diff.width = values->end_value.width - values->start_value.width;
+	values->value_diff.height = values->end_value.height - values->start_value.height;
+	values->tween_callback = tween_callback;
+
+	tween->tween_values = values;
+}
+
+void tween_size_tick(Tween *tween, float tick_diff) {
+	TweenValuesSize *values = tween->tween_values;
+	float next_value_width = (tick_diff * values->value_diff.width) + values->start_value.width;
+	float next_value_height = (tick_diff * values->value_diff.height) + values->start_value.height;
+	values->tween_callback(tween->target_object, new_size(next_value_width, next_value_height));
+}
+
+void tween_size_swap(Tween *tween) {
+	TweenValuesSize *values = tween->tween_values;
+	Size start_value = values->start_value;
+	values->start_value = values->end_value;
+	values->end_value = start_value;
+	values->value_diff.width = values->end_value.width - values->start_value.width;
+	values->value_diff.height = values->end_value.height - values->start_value.height;
 }

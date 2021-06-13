@@ -3,11 +3,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "mem_pool.h"
+#include "size.h"
 
 /**
  * @brief Enum with the types of Tweens available.
  */
-typedef enum { TWEEN_NONE, TWEEN_FLOAT } TweenType;
+typedef enum { TWEEN_NONE, TWEEN_FLOAT, TWEEN_SIZE } TweenType;
 
 /**
  * @brief Easing function callback. See 'easing.h' for functions.
@@ -31,6 +32,16 @@ typedef void (*fnTWCallbackEnding)(void *target_object);
  *            Current float value based on the easing function.
  */
 typedef void (*fnTWCallbackFloat)(void *target_object, float current_value);
+
+/**
+ * @brief Callback for TWEEN_SIZE.
+ *
+ * @param[in] target_object
+ *            Object sent on 'tween_init'.
+ * @param[in] current_value
+ *            Current float value based on the easing function.
+ */
+typedef void (*fnTWCallbackSize)(void *target_object, Size current_value);
 
 /**
  * @brief Struct for the Tween
@@ -120,21 +131,29 @@ void tween_start(Tween *tween, void *target_object, fnTWEasingFunction easing_fu
  *
  * @param tween
  *        Tween already initialized that should be used.
- * @param target_object
- *        Object that will change. Will be used on the calledback during tween_tick.
- * @param easing_function
- *        Function that should be used to ease the values. See easing.h.
- * @param tween_ending
- *        Function that should be called when the Tween ends. Can be NULL.
  * @param start_value
  *        Starting value for the easing.
  * @param end_value
  *        End value for the easing.
- * @param duration_in_ms
- *        Time in ms that it should take to go from start_value to end_value.
  * @param tween_callback
  *        Callback that will be called on 'tween_tick' with the update value. (eg.: void
  * tween_callback(void *target_object, float current_value))
  */
 void tween_set_to_float(Tween *tween, float start_value, float end_value,
 						fnTWCallbackFloat tween_callback);
+
+/**
+ * @brief Allocates and start the Tween to update a Size value.
+ *
+ * @param tween
+ *        Tween already initialized that should be used.
+ * @param start_value
+ *        Starting value for the easing.
+ * @param end_value
+ *        End value for the easing.
+ * @param tween_callback
+ *        Callback that will be called on 'tween_tick' with the update value. (eg.: void
+ * tween_callback(void *target_object, float current_value))
+ */
+void tween_set_to_size(Tween *tween, Size start_value, Size end_value,
+					   fnTWCallbackSize tween_callback);
