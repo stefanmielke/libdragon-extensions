@@ -12,6 +12,12 @@
 
 #include "mem_pool.h"
 
+/**
+ * @brief Creates all structs and functions for the Object Pool for the type provided.
+ *
+ * @param[in] TYPE
+ *            Type that will be used on the Object Pool.
+ */
 #define OBJPOOL_INIT(TYPE)                                                                         \
 	typedef union objpool_##TYPE##_item_s objpool_##TYPE##_item_t;                                 \
 	union objpool_##TYPE##_item_s {                                                                \
@@ -70,7 +76,49 @@
 	}
 
 #define objpool_t(TYPE) objpool_##TYPE##_t
+
+/**
+ * @brief Allocates an object pool for the type provided.
+ *
+ * @param[in] TYPE
+ *            Type used when creating the object pool.
+ * @param[in] MEMORY_POOL
+ *            MemZone that will be used to allocate the object pool. If NULL will used malloc/calloc
+ * instead (remember to call 'objpool_free' in that case).
+ * @param[in] NUM
+ *            Amount of objects in the object pool.
+ */
 #define objpool_create(TYPE, MEMORY_POOL, NUM) objpool_##TYPE##_create(MEMORY_POOL, NUM)
+
+/**
+ * @brief Destroy the Object Pool provided. Only use this if not using a memory pool.
+ *
+ * @param[in] TYPE
+ *            Type used when creating the object pool.
+ * @param[in] POOL
+ *            Object pool to return the object to.
+ */
 #define objpool_destroy(TYPE, POOL) objpool_##TYPE##_destroy(POOL)
+
+/**
+ * @brief Get a new object from the pool. Returns NULL if there are no objects available (all are in
+ * use).
+ *
+ * @param[in] TYPE
+ *            Type used when creating the object pool.
+ * @param[in] POOL
+ *            Object pool to get the object from.
+ */
 #define objpool_get(TYPE, POOL) objpool_##TYPE##_get(POOL)
+
+/**
+ * @brief Returns an object to the object pool so that it can be reused later.
+ *
+ * @param[in] TYPE
+ *            Type used when creating the object pool.
+ * @param[in] POOL
+ *            Object pool to get the object from.
+ * @param[in] OBJ
+ *            Object that will be returned to the pool. Do not use this object after this call.
+ */
 #define objpool_free(TYPE, POOL, OBJ) objpool_##TYPE##_free(POOL, OBJ)
