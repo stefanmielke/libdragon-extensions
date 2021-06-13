@@ -271,6 +271,44 @@ if (scene_manager->current_scene_id != scene_manager->next_scene_id) {
 scene_manager_destroy(scene_manager);
 ```
 
+### Object Pooling (Free List)
+
+Object Pooling is used to create and dispose of objects rapidly and without causing memory fragmentation.
+
+It uses a macro to ensure that you can use your struct without having to cast from and to void*, but that can lead to more code being generated, so use it with care.
+
+The implementation provided is of a [Free List](https://gameprogrammingpatterns.com/object-pool.html#a-free-list) and based off of [djolman's implementation](https://github.com/djoldman/fmpool) with a few modifications.
+
+```c
+// define the struct to be used
+typedef struct
+{
+	int x;
+	int y;
+} Point_t;
+
+// initialize the Object Pool macro to use 'Point_t'
+// this will create all the struct and function definitions used in the implementation
+// remember that you can initialize more than once and it will generate one for each struct
+OBJPOOL_INIT(Point_t)
+
+// creates the object pool
+objpool_t(Point_t) * pool;
+// when using a memory pool
+pool = objpool_create(Point_t, &memory_pool, 10);
+// if not using a memory pool. remember to call 'objpool_destroy' later in this case.
+pool = objpool_create(Point_t, NULL, 10);
+
+// Get a new object from the pool
+Point_t *new_obj = objpool_get(Point_t, pool);
+
+// Free the object from the pool
+objpool_free(Point_t, pool, new_obj);
+
+// Free pool's memory. Only call this if not using a memory pool.
+objpool_destroy(Point_t, pool);
+```
+
 ## More Examples
 
 I'm trying to test and use this code on [my game](https://github.com/stefanmielke/mielkesparty_n64). So feel free to look there for more examples.
