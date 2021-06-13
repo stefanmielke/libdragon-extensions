@@ -194,9 +194,14 @@ It will consume more memory, and will take more time to init, and also doesn't h
 Size grid_size = new_size(50, 50); // map tiles: 50x50
 Size tile_size = new_size_same(16); // tile size: 16x16
 TiledCached *tile_test = tiled_cached_init(&memory_pool, tile_sprite, "/path/to/map.map", grid_size, tile_size);
+// use malloc instead of memory pool
+TiledCached *tile_test = tiled_cached_init(NULL, tile_sprite, "/path/to/map.map", grid_size, tile_size);
 
 // Render the map
 tiled_cached_render(tile_test, screen_rect);
+
+// if not using memory pool (and only if not using), you have to call destroy to free the memory used
+tiled_cached_destroy(tile_test);
 ```
 
 ### Scene Manager
