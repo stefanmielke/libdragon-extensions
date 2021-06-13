@@ -61,3 +61,12 @@ void tiled_render(display_context_t disp, Tiled *tiled, Rect screen_rect);
  *        Rect of the current screen. Used to cull tiles outside of the screen.
  */
 void tiled_render_rdp(Tiled *tiled, Rect screen_rect);
+
+/**
+ * @brief Destroy a Tiled created when not using a memory pool. Do not call this function if using a
+ * memory pool.
+ *
+ * @param tiled
+ *        Tiled to destroy.
+ */
+void tiled_destroy(Tiled *tiled);

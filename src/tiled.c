@@ -24,7 +24,11 @@
 // Init a Tiled map
 Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, Size map_size,
 				  Size tile_size) {
-	Tiled *tiled_map = mem_zone_alloc(memory_pool, sizeof(Tiled));
+	Tiled *tiled_map = NULL;
+	if (memory_pool)
+		tiled_map = mem_zone_alloc(memory_pool, sizeof(Tiled));
+	else
+		tiled_map = malloc(sizeof(Tiled));
 	tiled_map->map_size = map_size;
 	tiled_map->tile_size = tile_size;
 	tiled_map->sprite = sprite;
@@ -84,4 +88,7 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
 								MIRROR_DISABLED);
 
 	END_LOOP()
+}
+
+void tiled_destroy(Tiled *tiled) {
 }

@@ -175,12 +175,17 @@ The maximum map size I was able to load was 50x50, so take that into considerati
 Size grid_size = new_size(50, 50); // map tiles: 50x50
 Size tile_size = new_size_same(16); // tile size: 16x16
 Tiled *tile_test = tiled_init(&memory_pool, tile_sprite, "/path/to/map.map", grid_size, tile_size);
+// using malloc instead of memory pool
+Tiled *tile_test = tiled_init(NULL, tile_sprite, "/path/to/map.map", grid_size, tile_size);
 
 // Render the map (software renderer)
 tiled_render(disp, tile_test, screen_rect);
 
 // Render the map (hardware renderer)
 tiled_render_rdp(tile_test, screen_rect);
+
+// if not using memory pool (and only if not using), you have to call destroy to free the memory used
+tiled_destroy(tile_test);
 ```
 
 > tiled_cached.h | tiled_cached.c
@@ -194,7 +199,7 @@ It will consume more memory, and will take more time to init, and also doesn't h
 Size grid_size = new_size(50, 50); // map tiles: 50x50
 Size tile_size = new_size_same(16); // tile size: 16x16
 TiledCached *tile_test = tiled_cached_init(&memory_pool, tile_sprite, "/path/to/map.map", grid_size, tile_size);
-// use malloc instead of memory pool
+// using malloc instead of memory pool
 TiledCached *tile_test = tiled_cached_init(NULL, tile_sprite, "/path/to/map.map", grid_size, tile_size);
 
 // Render the map
