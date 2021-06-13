@@ -2,7 +2,6 @@
 
 #include <libdragon.h>
 #include "mem_pool.h"
-#include "util_defs.h"
 
 /**
  * @brief Struct with a sprite that can be animated.

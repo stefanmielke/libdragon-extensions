@@ -1,8 +1,7 @@
 #pragma once
 
-#include "util_defs.h"
-#include "mem_pool.h"
 #include <libdragon.h>
+#include "mem_pool.h"
 
 /**
  * @brief Struct that holds a SpriteBatch.
