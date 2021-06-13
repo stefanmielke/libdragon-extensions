@@ -11,9 +11,16 @@ typedef enum { TWEEN_NONE, TWEEN_FLOAT } TweenType;
 
 /**
  * @brief Easing function callback. See 'easing.h' for functions.
- *
  */
 typedef float (*fnTWEasingFunction)(float value);
+
+/**
+ * @brief Callback for when the tween ends.
+ *
+ * If 'auto_reverse' is set, it is called when it finishes reversing.
+ * If 'always_repeat' is set, it will never be called.
+ */
+typedef void (*fnTWCallbackEnding)(void *target_object);
 
 /**
  * @brief Callback for TWEEN_FLOAT.
@@ -35,12 +42,26 @@ typedef struct {
 	void *tween_values;
 	/// If the easing was finished or not.
 	bool finished;
+	/// If will start reversing at the end.
+	bool auto_reverse;
+	/// If it is reversing.
+	bool is_reversing;
+	/// Repeat when is completed.
+	bool always_repeat;
 	/// Type of the tween. See tween_init.
 	TweenType type;
 	/// Memory pool used to allocate the structs. NULL if none should be used.
 	MemZone *allocator;
 	/// Easing function. See tween_init.
 	fnTWEasingFunction easing_function;
+	/// Function called when the tween ends. Can be NULL.
+	fnTWCallbackEnding ending_callback;
+	/// Current time in ms since the start of the tween.
+	uint64_t current_time;
+	/// Total duration of the Tween in ms.
+	uint64_t duration_in_ms;
+	/// Last calculated ms.
+	uint64_t last_ms;
 } Tween;
 
 /**
@@ -48,14 +69,10 @@ typedef struct {
  *
  * @param memory_pool
  *        Memory pool that should be used to allocate memory. Can be NULL if none should be used.
- * @param target_object
- *        Object that will change. Will be used on the calledback during tween_tick.
- * @param easing_function
- *        Function that should be used to ease the values. See easing.h.
  *
  * @return The new Tween.
  */
-Tween *tween_init(MemZone *memory_pool, void *target_object, fnTWEasingFunction easing_function);
+Tween *tween_init(MemZone *memory_pool);
 
 /**
  * @brief Destroy the memory allocated for the Tween.
@@ -74,10 +91,41 @@ void tween_destroy(Tween *tween);
 void tween_tick(Tween *tween);
 
 /**
+ * @brief Allocates and start the Tween. You should call 'tween_set_to_*' after this call to define
+ * the Tween values.
+ *
+ * @param tween
+ *        Tween already initialized that should be used.
+ * @param target_object
+ *        Object that will change. Will be used on the calledback during tween_tick.
+ * @param easing_function
+ *        Function that should be used to ease the values. See easing.h.
+ * @param duration_in_ms
+ *        Time in ms that it should take to go from start_value to end_value.
+ * @param tween_ending
+ *        Callback that will be called when the Tween ends. Can be NULL. Is not used if
+ * 'always_repeat' is true.
+ * @param auto_reverse
+ *        If it should go back after finishing. If set, will only call 'tween_ending' after it
+ * finishes reversing.
+ * @param always_repeat
+ *        If it should loop infinitely.
+ */
+void tween_start(Tween *tween, void *target_object, fnTWEasingFunction easing_function,
+				 uint64_t duration_in_ms, fnTWCallbackEnding tween_ending, bool auto_reverse,
+				 bool always_repeat);
+
+/**
  * @brief Allocates and start the Tween to update a float value.
  *
  * @param tween
  *        Tween already initialized that should be used.
+ * @param target_object
+ *        Object that will change. Will be used on the calledback during tween_tick.
+ * @param easing_function
+ *        Function that should be used to ease the values. See easing.h.
+ * @param tween_ending
+ *        Function that should be called when the Tween ends. Can be NULL.
  * @param start_value
  *        Starting value for the easing.
  * @param end_value
@@ -88,5 +136,5 @@ void tween_tick(Tween *tween);
  *        Callback that will be called on 'tween_tick' with the update value. (eg.: void
  * tween_callback(void *target_object, float current_value))
  */
-void tween_start_to_float(Tween *tween, float start_value, float end_value, uint64_t duration_in_ms,
-						  fnTWCallbackFloat tween_callback);
+void tween_set_to_float(Tween *tween, float start_value, float end_value,
+						fnTWCallbackFloat tween_callback);

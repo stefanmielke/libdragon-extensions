@@ -309,9 +309,9 @@ objpool_free(Point_t, pool, new_obj);
 objpool_destroy(Point_t, pool);
 ```
 
-### Tween
+### Tweening
 
-We support Tween and easing through a few function.
+We support [Tweening](https://en.wikipedia.org/wiki/Inbetweening) and easing through a few functions.
 
 ```c
 // example struct
@@ -319,25 +319,40 @@ typedef struct {
 	int x;
 } Player;
 Player *my_player;
-// callback
+// callback for value changes
 void tween_player_x(void *target_object, float current_value) {
 	Player *player = (Player *)target_object;
 	player->x = current_value;
 }
+// example callback for when the tween finishes
+void tween_finished_player_x(void *target_object);
 
 Tween *tween;
 
-// initialize the tween using 'easing_bounce_in_out' and a memory pool
-tween = tween_init(&memory_pool, (void *)my_player, &easing_bounce_in_out);
+// initialize the tween with a memory pool
+tween = tween_init(&memory_pool);
 // initialize without a memory pool
-tween = tween_init(NULL, (void *)my_player, &easing_bounce_in_out);
+tween = tween_init(NULL);
 
-// setting the tween to use a float tween
-float start_x = 50, end_x = 200;
+// starting the tween, examples
 uint64_t duration_in_ms = 2000; // 2 seconds
-tween_start_to_float(tween, start_x, end_x, duration_in_ms, &tween_player_x);
 
-// calling tick every frame. It will call your callback with the new value.
+// 1. No ending callback, no reverse, no always repeat
+tween_start(tween, (void *)my_player, &easing_bounce_in_out, duration_in_ms, NULL, false, false);
+// 2. Ending callback, no reverse, no always repeat
+tween_start(tween, (void *)my_player, &easing_bounce_in_out, duration_in_ms, &tween_finished_player_x, false, false);
+// 3. Ending callback, auto reverse, no always repeat
+tween_start(tween, (void *)my_player, &easing_bounce_in_out, duration_in_ms, &tween_finished_player_x, true, false);
+// 4. No ending callback, no auto reverse, always repeat (if always repeat, it will never call the ending callback)
+tween_start(tween, (void *)my_player, &easing_bounce_in_out, duration_in_ms, NULL, false, true);
+// 4. No ending callback, auto reverse, always repeat (if always repeat, it will never call the ending callback)
+tween_start(tween, (void *)my_player, &easing_bounce_in_out, duration_in_ms, NULL, true, true);
+
+// setting the tween to use a float tween (shuld be called right after starting)
+float start_x = 50, end_x = 200;
+tween_set_to_float(tween, start_x, end_x, &tween_player_x);
+
+// calling tick every frame. It will call 'tween_player_x' with the new value, and 'tween_finished_player_x' when it finishes
 tween_tick(tween);
 
 // destroying the tween (unnecessary but safe when using a memory pool)

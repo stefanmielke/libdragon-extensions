@@ -4,15 +4,14 @@
 #include "../include/easing.h"
 #include "../include/memory_alloc.h"
 
-void tween_float_tick(Tween *tween);
+void tween_float_tick(Tween *tween, float tick_diff);
+void tween_float_swap(Tween *tween);
 
-Tween *tween_init(MemZone *memory_pool, void *target_object, fnTWEasingFunction easing_function) {
+Tween *tween_init(MemZone *memory_pool) {
 	Tween *tween = MEM_ALLOC(sizeof(Tween), memory_pool);
 	tween->allocator = memory_pool;
-	tween->target_object = target_object;
 	tween->type = TWEEN_NONE;
 	tween->finished = false;
-	tween->easing_function = easing_function;
 
 	return tween;
 }
@@ -25,16 +24,70 @@ void tween_destroy(Tween *tween) {
 }
 
 void tween_tick(Tween *tween) {
-	if (tween->finished)
+	if (tween->finished || !tween->tween_values)
 		return;
+
+	uint64_t current_ms = get_ticks_ms();
+	uint64_t tick_since_last = current_ms - tween->last_ms;
+	tween->current_time += tick_since_last;
+	tween->last_ms = current_ms;
+
+	float tick_diff = tween->current_time / (float)tween->duration_in_ms;
+
+	tick_diff = tween->easing_function(tick_diff);
 
 	switch (tween->type) {
 		case TWEEN_FLOAT:
-			tween_float_tick(tween);
+			tween_float_tick(tween, tick_diff);
 			break;
 		default:
 			break;
 	}
+
+	if (tween->current_time >= tween->duration_in_ms) {
+		if ((!tween->always_repeat && !tween->auto_reverse) ||
+			(tween->auto_reverse && tween->is_reversing && !tween->always_repeat)) {
+			if (tween->ending_callback)
+				tween->ending_callback(tween->target_object);
+
+			tween->finished = true;
+			return;
+		}
+
+		if (tween->auto_reverse && (!tween->is_reversing || tween->always_repeat)) {
+			tween->current_time = 0;
+			tween->is_reversing = !tween->is_reversing;
+			switch (tween->type) {
+				case TWEEN_FLOAT:
+					tween_float_swap(tween);
+					break;
+				default:
+					break;
+			}
+			return;
+		}
+
+		if (tween->always_repeat) {
+			tween->current_time = 0;
+			return;
+		}
+	}
+}
+
+void tween_start(Tween *tween, void *target_object, fnTWEasingFunction easing_function,
+				 uint64_t duration_in_ms, fnTWCallbackEnding tween_ending, bool auto_reverse,
+				 bool always_repeat) {
+	tween->type = TWEEN_FLOAT;
+	tween->target_object = target_object;
+	tween->easing_function = easing_function;
+	tween->finished = false;
+	tween->current_time = 0;
+	tween->duration_in_ms = duration_in_ms;
+	tween->last_ms = get_ticks_ms();
+	tween->ending_callback = tween_ending;
+	tween->auto_reverse = auto_reverse;
+	tween->is_reversing = false;
+	tween->always_repeat = always_repeat;
 }
 
 // Tween Float
@@ -42,50 +95,31 @@ void tween_tick(Tween *tween) {
 typedef struct {
 	float start_value;
 	float end_value;
-	float value_per_tick;
-	uint64_t current_time;
-	uint64_t duration_in_ticks;
-	uint64_t start_tick;
-	uint64_t last_tick;
+	float value_diff;
 	fnTWCallbackFloat tween_callback;
 } TweenValuesFloat;
 
-void tween_start_to_float(Tween *tween, float start_value, float end_value, uint64_t duration_in_ms,
-						  fnTWCallbackFloat tween_callback) {
-	tween->type = TWEEN_FLOAT;
-
+void tween_set_to_float(Tween *tween, float start_value, float end_value,
+						fnTWCallbackFloat tween_callback) {
 	TweenValuesFloat *values = MEM_ALLOC(sizeof(TweenValuesFloat), tween->allocator);
 	values->start_value = start_value;
 	values->end_value = end_value;
-	values->current_time = 0;
-	values->duration_in_ticks = duration_in_ms;
+	values->value_diff = end_value - start_value;
 	values->tween_callback = tween_callback;
-	values->value_per_tick = (end_value - start_value) /*/ TICKS_FROM_MS(duration_in_ms)*/;
-	values->start_tick = get_ticks_ms();
-	values->last_tick = values->start_tick;
 
 	tween->tween_values = values;
 }
 
-void tween_float_tick(Tween *tween) {
-	if (!tween->tween_values)
-		return;
-
+void tween_float_tick(Tween *tween, float tick_diff) {
 	TweenValuesFloat *values = tween->tween_values;
-
-	uint64_t current_tick = get_ticks_ms();
-	uint64_t tick_since_last = current_tick - values->last_tick;
-	values->current_time += tick_since_last;
-	values->last_tick = current_tick;
-
-	if (values->current_time >= values->duration_in_ticks) {
-		tween->finished = true;
-	}
-
-	float tick_diff = values->current_time / (float)values->duration_in_ticks;
-
-	tick_diff = tween->easing_function(tick_diff);
-
-	float next_value = (tick_diff * values->value_per_tick) + values->start_value;
+	float next_value = (tick_diff * values->value_diff) + values->start_value;
 	values->tween_callback(tween->target_object, next_value);
+}
+
+void tween_float_swap(Tween *tween) {
+	TweenValuesFloat *values = tween->tween_values;
+	float start_value = values->start_value;
+	values->start_value = values->end_value;
+	values->end_value = start_value;
+	values->value_diff = values->end_value - values->start_value;
 }
