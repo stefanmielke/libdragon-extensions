@@ -4,21 +4,60 @@
 #include "mem_pool.h"
 #include "rect.h"
 
+/**
+ * @brief Struct that holds a Tiled map.
+ */
 typedef struct {
+	/// Map data.
 	char *map;
+	/// Size of the map in tiles.
 	Size map_size;
+	/// Size of each tile.
 	Size tile_size;
+	/// Sprite used to render.
 	sprite_t *sprite;
 } Tiled;
 
 // Init a Tiled map
+/**
+ * @brief Allocates, loads, and initializes the Tiled map.
+ *
+ * @param memory_pool
+ *        MemZone to use to allocate.
+ * @param sprite
+ *        Sprite used to render.
+ * @param map_path
+ *        Path to the map file (eg.: "/maps/my_map.csv"). Has to be a CSV file.
+ * @param map_size
+ *        Size of the map in tiles.
+ * @param tile_size
+ *        Size of each tile.
+ *
+ * @return The new Tiled.
+ */
 Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, Size map_size,
 				  Size tile_size);
 
-// Render a Tiled map (uses software rendering since it's faster for this)
-// Use this for constant timing, and when you have lots of different textures
+/**
+ * @brief Render a Tiled map using software rendering. Use this method for constant timing, or maps
+ * that have lots of different tiles.
+ *
+ * @param disp
+ *        Display Constext to render to.
+ * @param tiled
+ *        Tiled to render.
+ * @param screen_rect
+ *        Rect of the current screen. Used to cull tiles outside of the screen.
+ */
 void tiled_render(display_context_t disp, Tiled *tiled, Rect screen_rect);
 
-// Render a Tiled map (uses hardware rendering)
-// Use this when there's not much texture swapping
+/**
+ * @brief Render a Tiled map using hardware rendering. Use this when there's not much texture
+ * swapping.
+ *
+ * @param tiled
+ *        Tiled to render.
+ * @param screen_rect
+ *        Rect of the current screen. Used to cull tiles outside of the screen.
+ */
 void tiled_render_rdp(Tiled *tiled, Rect screen_rect);
