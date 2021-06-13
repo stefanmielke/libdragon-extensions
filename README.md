@@ -84,6 +84,8 @@ size_t batch_size = 10;
 Size sprite_size = new_size_same(10);
 Position offset_position = new_position_same(7); // start drawing at position - 7, the sprite is bigger than its collision
 SpriteBatch *batch = sprite_batch_init(&memory_pool, sprites, batch_size, sprite_size, offset_position);
+// you can pass NULL on memory_pool to use malloc instead of MemZone.
+SpriteBatch *batch = sprite_batch_init(NULL, sprites, batch_size, sprite_size, offset_position);
 
 // set positions
 for (size_t i = 0; i < batch_size; ++i) {
@@ -95,6 +97,9 @@ for (size_t i = 0; i < batch_size; ++i) {
 Rect screen_rect = new_rect(new_pos(0, 0), new_size(320, 240));
 int current_frame = 5; // we can update the frame that will be used on all draw calls
 sprite_batch_draw(batch, current_frame, screen_rect);
+
+// destroy the SpriteBatch. Should only be called if you sent NULL on 'memory_pool' when initializing.
+sprite_batch_destroy(batch);
 ```
 
 ### Animated Sprite
