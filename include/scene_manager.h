@@ -33,22 +33,26 @@ typedef void (*fnSMDestroyCallback)();
 typedef void (*fnSMSceneChangeCallback)(short from_scene_id, short to_scene_id);
 
 typedef struct {
+	/// @see fnSMCreateCallback
 	fnSMCreateCallback create;
+	/// @see fnSMTickCallback
 	fnSMTickCallback tick;
+	/// @see fnSMDisplayCallback
 	fnSMDisplayCallback display;
+	/// @see fnSMDestroyCallback
 	fnSMDestroyCallback destroy;
 } SceneCallbacks;
 
 typedef struct {
-	// Current loaded scene
+	/// Current loaded scene
 	short current_scene_id;
-	// Next scene. Only != 'current_scene_id' if wants to change the scene.
+	/// Next scene. Only != 'current_scene_id' if wants to change the scene.
 	short next_scene_id;
-	// Scene memory pool. If !NULL will call 'mem_zone_free_all' when changing scenes.
+	/// Scene memory pool. If !NULL will call 'mem_zone_free_all' when changing scenes.
 	MemZone *scene_memory_pool;
-	// Function that will be called when changing the scene. Called by 'scene_manager_tick'.
+	/// Function that will be called when changing the scene. Called by 'scene_manager_tick'.
 	fnSMSceneChangeCallback change_scene_callback;
-	// Callbacks used by the scene.
+	/// Callbacks used by the scene.
 	SceneCallbacks scene_callbacks;
 } SceneManager;
 
