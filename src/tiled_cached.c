@@ -4,7 +4,11 @@
 
 TiledCached *tiled_cached_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path,
 							   Size map_size, Size tile_size) {
-	TiledCached *tiled_map = mem_zone_alloc(memory_pool, sizeof(TiledCached));
+	TiledCached *tiled_map = NULL;
+	if (memory_pool)
+		tiled_map = mem_zone_alloc(memory_pool, sizeof(TiledCached));
+	else
+		tiled_map = malloc(sizeof(TiledCached));
 	tiled_map->map_size = map_size;
 	tiled_map->tile_size = tile_size;
 	tiled_map->sprite = sprite;
@@ -84,4 +88,8 @@ void tiled_cached_render(TiledCached *tiled, Rect screen_rect) {
 			}
 		}
 	}
+}
+
+void tiled_cached_destroy(TiledCached *tiled) {
+	free(tiled);
 }

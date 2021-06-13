@@ -31,7 +31,8 @@ typedef struct {
  * @brief Allocates, loads, and initializes the TiledCached map.
  *
  * @param memory_pool
- *        MemZone to use to allocate.
+ *        MemZone to use to allocate. If NULL will use malloc instead, call 'tiled_cached_destroy'
+ * if you do.
  * @param sprite
  *        Sprite used to render.
  * @param map_path
@@ -56,3 +57,11 @@ TiledCached *tiled_cached_init(MemZone *memory_pool, sprite_t *sprite, const cha
  *        Rect of the current screen. Used to cull tiles outside of the screen.
  */
 void tiled_cached_render(TiledCached *tiled, Rect screen_rect);
+
+/**
+ * @brief Destroy a TiledCached that didn't use a memory pool on init.
+ *
+ * @param tiled
+ *        TiledCached to destroy.
+ */
+void tiled_cached_destroy(TiledCached *tiled);
