@@ -1,8 +1,13 @@
 #include "../include/scene_manager.h"
 
-SceneManager *scene_manager_init(MemZone *memory_pool, MemZone *scene_memory_pool,
+SceneManager *scene_manager_init(MemZone *global_memory_pool, MemZone *scene_memory_pool,
 								 fnSMSceneChangeCallback change_scene_callback) {
-	SceneManager *scene_manager = mem_zone_alloc(memory_pool, sizeof(SceneManager));
+	SceneManager *scene_manager = NULL;
+	if (global_memory_pool)
+		scene_manager = mem_zone_alloc(global_memory_pool, sizeof(SceneManager));
+	else
+		scene_manager = malloc(sizeof(SceneManager));
+
 	scene_manager->change_scene_callback = change_scene_callback;
 	scene_manager->current_scene_id = -1;
 	scene_manager->scene_memory_pool = scene_memory_pool;
@@ -22,6 +27,9 @@ void scene_manager_set_callbacks(SceneManager *scene_manager, fnSMCreateCallback
 	scene_manager->scene_callbacks.tick = tick_callback;
 	scene_manager->scene_callbacks.display = display_callback;
 	scene_manager->scene_callbacks.destroy = destroy_callback;
+
+	if (!scene_manager->scene_callbacks.tick || !scene_manager->scene_callbacks.display)
+		abort();
 }
 
 void scene_manager_tick(SceneManager *scene_manager) {

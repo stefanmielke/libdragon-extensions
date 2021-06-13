@@ -13,7 +13,7 @@ typedef void (*fnSMDisplayCallback)(display_context_t disp);
 typedef void (*fnSMDestroyCallback)();
 // Called by scene_manager_tick a frame after the user calls scene_manager_change_scene.
 // Should call scene_manager_set_callbacks to set up the scene.
-typedef bool (*fnSMSceneChangeCallback)(short from_scene_id, short to_scene_id);
+typedef void (*fnSMSceneChangeCallback)(short from_scene_id, short to_scene_id);
 
 typedef struct {
 	fnSMCreateCallback create;
@@ -31,8 +31,10 @@ typedef struct {
 } SceneManager;
 
 // Initializes the Scene Manager
+// If global_memory_pool is NULL, will use malloc instead.
 // If scene_memory_pool is NULL, it will not free memory on screen changes.
-SceneManager *scene_manager_init(MemZone *memory_pool, MemZone *scene_memory_pool,
+// DO NOT use the same MemZone for global_memory_pool and scene_memory_pool.
+SceneManager *scene_manager_init(MemZone *global_memory_pool, MemZone *scene_memory_pool,
 								 fnSMSceneChangeCallback change_scene_callback);
 
 // Marks scene to change to the scene_id.
