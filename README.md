@@ -309,6 +309,41 @@ objpool_free(Point_t, pool, new_obj);
 objpool_destroy(Point_t, pool);
 ```
 
+### Tween
+
+We support Tween and easing through a few function.
+
+```c
+// example struct
+typedef struct {
+	int x;
+} Player;
+Player *my_player;
+// callback
+void tween_player_x(void *target_object, float current_value) {
+	Player *player = (Player *)target_object;
+	player->x = current_value;
+}
+
+Tween *tween;
+
+// initialize the tween using 'easing_bounce_in_out' and a memory pool
+tween = tween_init(&memory_pool, (void *)my_player, &easing_bounce_in_out);
+// initialize without a memory pool
+tween = tween_init(NULL, (void *)my_player, &easing_bounce_in_out);
+
+// setting the tween to use a float tween
+float start_x = 50, end_x = 200;
+uint64_t duration_in_ms = 2000; // 2 seconds
+tween_start_to_float(tween, start_x, end_x, duration_in_ms, &tween_player_x);
+
+// calling tick every frame. It will call your callback with the new value.
+tween_tick(tween);
+
+// destroying the tween (unnecessary but safe when using a memory pool)
+tween_destroy(tween);
+```
+
 ## More Examples
 
 I'm trying to test and use this code on [my game](https://github.com/stefanmielke/mielkesparty_n64). So feel free to look there for more examples.
