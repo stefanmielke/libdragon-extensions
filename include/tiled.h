@@ -23,7 +23,8 @@ typedef struct {
  * @brief Allocates, loads, and initializes the Tiled map.
  *
  * @param memory_pool
- *        MemZone to use to allocate.
+ *        MemZone to use to allocate. If NULL will use 'malloc', in that case remember to call
+ * 'tiled_destroy' to free the memory allocated.
  * @param sprite
  *        Sprite used to render.
  * @param map_path
