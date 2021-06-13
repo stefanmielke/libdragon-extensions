@@ -2,8 +2,16 @@
 
 SpriteBatch *sprite_batch_init(MemZone *memory_pool, sprite_t *sprite, size_t qty, Size size,
 							   Position render_offset) {
-	SpriteBatch *batch = mem_zone_alloc(memory_pool, sizeof(SpriteBatch));
-	batch->positions = mem_zone_alloc(memory_pool, sizeof(Position) * qty);
+	SpriteBatch *batch = NULL;
+	batch->positions = NULL;
+
+	if (memory_pool) {
+		batch = mem_zone_alloc(memory_pool, sizeof(SpriteBatch));
+		batch->positions = mem_zone_alloc(memory_pool, sizeof(Position) * qty);
+	} else {
+		batch = malloc(sizeof(SpriteBatch));
+		batch->positions = malloc(sizeof(Position) * qty);
+	}
 	batch->sprite = sprite;
 	batch->qty = qty;
 	batch->size = size;
@@ -25,4 +33,9 @@ void sprite_batch_draw(SpriteBatch *sprite_batch, int offset, Rect screen_rect) 
 							rect.pos.y - sprite_batch->render_offset.y, MIRROR_DISABLED);
 		}
 	}
+}
+
+void sprite_batch_destroy(SpriteBatch *sprite_batch) {
+	free(sprite_batch->positions);
+	free(sprite_batch);
 }

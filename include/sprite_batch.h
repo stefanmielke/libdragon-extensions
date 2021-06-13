@@ -24,7 +24,8 @@ typedef struct {
  * @brief Allocates and initializes a SpriteBatch.
  *
  * @param memory_pool
- *        MemZone to use to allocate the SpriteBatch.
+ *        MemZone to use to allocate the SpriteBatch. If NULL will use 'malloc' and you have to free
+ * memory using 'sprite_batch_destroy'.
  * @param sprite
  *        Sprite used to render the batch.
  * @param qty
@@ -50,3 +51,12 @@ SpriteBatch *sprite_batch_init(MemZone *memory_pool, sprite_t *sprite, size_t qt
  *        Rect of the current screen. Used to check if the sprite is on the screen.
  */
 void sprite_batch_draw(SpriteBatch *sprite_batch, int offset, Rect screen_rect);
+
+/**
+ * @brief Used to free memory allocated from SpriteBatch. Only use if no MemZone was used on
+ * 'sprite_batch_init'.
+ *
+ * @param sprite_batch
+ *        SpriteBatch to destroy.
+ */
+void sprite_batch_destroy(SpriteBatch *sprite_batch);
