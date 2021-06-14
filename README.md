@@ -320,7 +320,7 @@ objpool_destroy(Point_t, pool);
 
 ### Tweening
 
-We support [Tweening](https://en.wikipedia.org/wiki/Inbetweening) and easing through a few functions.
+We support [Tweening](https://en.wikipedia.org/wiki/Inbetweening) and easing through a few functions. Easing functions were based on [MonoGame.Extended Methods](https://www.monogameextended.net/docs/features/tweening/tweening#in-easing-functions).
 
 ```c
 // example struct
