@@ -13,6 +13,9 @@ void tween_size_swap(Tween *tween);
 void tween_position_tick(Tween *tween, float tick_diff);
 void tween_position_swap(Tween *tween);
 
+void tween_color_tick(Tween *tween, float tick_diff);
+void tween_color_swap(Tween *tween);
+
 Tween *tween_init(MemZone *memory_pool) {
 	Tween *tween = MEM_ALLOC(sizeof(Tween), memory_pool);
 	tween->allocator = memory_pool;
@@ -52,6 +55,9 @@ void tween_tick(Tween *tween) {
 		case TWEEN_POSITION:
 			tween_position_tick(tween, tick_diff);
 			break;
+		case TWEEN_COLOR:
+			tween_color_tick(tween, tick_diff);
+			break;
 		default:
 			break;
 	}
@@ -78,6 +84,9 @@ void tween_tick(Tween *tween) {
 					break;
 				case TWEEN_POSITION:
 					tween_position_swap(tween);
+					break;
+				case TWEEN_COLOR:
+					tween_color_swap(tween);
 					break;
 				default:
 					break;
@@ -220,4 +229,57 @@ void tween_position_swap(Tween *tween) {
 	values->end_value = start_value;
 	values->value_diff.x = values->end_value.x - values->start_value.x;
 	values->value_diff.y = values->end_value.y - values->start_value.y;
+}
+
+// Tween Color
+
+// diff in color can be negative
+typedef struct {
+	int16_t r;
+	int16_t g;
+	int16_t b;
+	int16_t a;
+} SignedColor;
+
+typedef struct {
+	color_t start_value;
+	color_t end_value;
+	SignedColor value_diff;
+	fnTWCallbackColor tween_callback;
+} TweenValuesColor;
+
+void tween_set_to_color(Tween *tween, color_t start_value, color_t end_value,
+						fnTWCallbackColor tween_callback) {
+	tween->type = TWEEN_COLOR;
+
+	TweenValuesColor *values = MEM_ALLOC(sizeof(TweenValuesColor), tween->allocator);
+	values->start_value = start_value;
+	values->end_value = end_value;
+	values->value_diff.r = values->end_value.r - values->start_value.r;
+	values->value_diff.g = values->end_value.g - values->start_value.g;
+	values->value_diff.b = values->end_value.b - values->start_value.b;
+	values->value_diff.a = values->end_value.a - values->start_value.a;
+	values->tween_callback = tween_callback;
+
+	tween->tween_values = values;
+}
+
+void tween_color_tick(Tween *tween, float tick_diff) {
+	TweenValuesColor *values = tween->tween_values;
+	uint8_t r = (tick_diff * values->value_diff.r) + values->start_value.r;
+	uint8_t g = (tick_diff * values->value_diff.g) + values->start_value.g;
+	uint8_t b = (tick_diff * values->value_diff.b) + values->start_value.b;
+	uint8_t a = (tick_diff * values->value_diff.a) + values->start_value.a;
+	values->tween_callback(tween->target_object, graphics_make_color(r, g, b, a));
+}
+
+void tween_color_swap(Tween *tween) {
+	TweenValuesColor *values = tween->tween_values;
+	color_t start_value = values->start_value;
+	values->start_value = values->end_value;
+	values->end_value = start_value;
+	values->value_diff.r = values->end_value.r - values->start_value.r;
+	values->value_diff.g = values->end_value.g - values->start_value.g;
+	values->value_diff.b = values->end_value.b - values->start_value.b;
+	values->value_diff.a = values->end_value.a - values->start_value.a;
 }

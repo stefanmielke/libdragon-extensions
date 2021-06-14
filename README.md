@@ -78,6 +78,15 @@ sprite_t *my_sprite = spritesheet_load(NULL, "/path/to/sprite.sprite");
 free(my_sprite);
 ```
 
+### Color Support
+> color.h
+
+Libdragon doesn't provide a single function that generates a color_t. So I created this function for this.
+
+```c
+color_t color = new_color(r, g, b, a);
+```
+
 ### Sprite Batch
 > sprite_batch.h | sprite_batch.c
 
@@ -326,6 +335,7 @@ void tween_player_x(void *target_object, float current_value) {
 }
 void tween_player_size(void *target_object, Size current_value);
 void tween_player_position(void *target_object, Position current_value);
+void tween_player_color(void *target_object, uint32_t current_value);
 // example callback for when the tween finishes
 void tween_finished_player_x(void *target_object);
 
@@ -360,6 +370,9 @@ tween_set_to_size(tween, start_size, end_size, &tween_player_size);
 // position tween
 Position start_position = new_position(10, 100), end_position = new_position(10, 300);
 tween_set_to_position(tween, start_position, end_position, &tween_player_position);
+// color tween (example uses new_color() from 'color.h')
+color_t start_color = new_color(10, 100), end_color = new_color(10, 300);
+tween_set_to_color(tween, start_color, end_color, &tween_player_color);
 
 // calling tick every frame. It will call 'tween_player_x' with the new value, and 'tween_finished_player_x' when it finishes
 tween_tick(tween);
