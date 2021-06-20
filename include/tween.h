@@ -136,8 +136,8 @@ void tween_tick(Tween *tween);
  * @param duration_in_ms
  *        Time in ms that it should take to go from start_value to end_value.
  * @param tween_ending
- *        Callback that will be called when the Tween ends. Can be NULL. Is not used if
- * 'always_repeat' is true.
+ *        Callback that will be called when the Tween ends (if auto_reverse is true, is only called
+ * when the reverse ends). Can be NULL.
  * @param auto_reverse
  *        If it should go back after finishing. If set, will only call 'tween_ending' after it
  * finishes reversing.
@@ -147,6 +147,17 @@ void tween_tick(Tween *tween);
 void tween_start(Tween *tween, void *target_object, fnTWEasingFunction easing_function,
 				 uint64_t duration_in_ms, fnTWCallbackEnding tween_ending, bool auto_reverse,
 				 bool always_repeat);
+
+/**
+ * @brief Changes duration of a Tween. Can cause weird effects if used outside of a
+ * 'fnTWCallbackEnding'.
+ *
+ * @param tween
+ *        Tween to update.
+ * @param duration_in_ms
+ *        New time in ms that it should take to go from start_value to end_value.
+ */
+void tween_change_duration(Tween *tween, uint64_t duration_in_ms);
 
 /**
  * @brief Allocates and start the Tween to update a float value.

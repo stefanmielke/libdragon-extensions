@@ -74,6 +74,10 @@ void tween_tick(Tween *tween) {
 
 		if (tween->auto_reverse && (!tween->is_reversing || tween->always_repeat)) {
 			tween->current_time = 0;
+			if (tween->is_reversing && tween->ending_callback) {
+				tween->ending_callback(tween->target_object);
+			}
+
 			tween->is_reversing = !tween->is_reversing;
 			switch (tween->type) {
 				case TWEEN_FLOAT:
@@ -96,6 +100,9 @@ void tween_tick(Tween *tween) {
 
 		if (tween->always_repeat) {
 			tween->current_time = 0;
+			if (tween->ending_callback)
+				tween->ending_callback(tween->target_object);
+
 			return;
 		}
 	}
@@ -115,6 +122,10 @@ void tween_start(Tween *tween, void *target_object, fnTWEasingFunction easing_fu
 	tween->auto_reverse = auto_reverse;
 	tween->is_reversing = false;
 	tween->always_repeat = always_repeat;
+}
+
+void tween_change_duration(Tween *tween, uint64_t duration_in_ms) {
+	tween->duration_in_ms = duration_in_ms;
 }
 
 // Tween Float
