@@ -68,7 +68,6 @@ bool contains(Rect inner, Rect outer);
 
 Set of functions to simplify random numbers in a range.
 
-
 ```c
 // generates an int from 0 to 10 (inclusive)
 int n1 = RANDN(10);
@@ -78,6 +77,21 @@ int n2 = RANDR(10, 20);
 float f1 = RANDNF(10);
 // generates an int from 10 to 20 (inclusive)
 float f2 = RANDRF(10, 20)
+```
+
+### Range
+> range.h
+
+Struct that contains a range and has functions to get random values from it.
+
+```c
+// generates a range from 0 to 10
+RangeFloat r1 = new_range_float(0, 10);
+// generates a range from 10 to 10
+RangeFloat r2 = new_range_float_same(10);
+
+// gets a random value from 0 to 10
+float value = range_get_from_float(&r1);
 ```
 
 ### Spritesheet Support
