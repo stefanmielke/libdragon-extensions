@@ -63,6 +63,23 @@ bool is_intersecting(Rect a, Rect b);
 bool contains(Rect inner, Rect outer);
 ```
 
+### Random
+> random.h
+
+Set of functions to simplify random numbers in a range.
+
+
+```c
+// generates an int from 0 to 10 (inclusive)
+int n1 = RANDN(10);
+// generates an int from 10 to 20 (inclusive)
+int n2 = RANDR(10, 20);
+// generates a float from 0 to 10 (inclusive)
+float f1 = RANDNF(10);
+// generates an int from 10 to 20 (inclusive)
+float f2 = RANDRF(10, 20)
+```
+
 ### Spritesheet Support
 > spritesheet.h
 
