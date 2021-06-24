@@ -388,7 +388,7 @@ tween_start(tween, (void *)my_player, &easing_bounce_in_out, duration_in_ms, &tw
 tween_start(tween, (void *)my_player, &easing_bounce_in_out, duration_in_ms, &tween_finished_player_x, true, false);
 // 4. No ending callback, no auto reverse, always repeat
 tween_start(tween, (void *)my_player, &easing_bounce_in_out, duration_in_ms, NULL, false, true);
-// 4. No ending callback, auto reverse, always repeat
+// 5. No ending callback, auto reverse, always repeat
 tween_start(tween, (void *)my_player, &easing_bounce_in_out, duration_in_ms, NULL, true, true);
 
 // set the tween to the desired type
