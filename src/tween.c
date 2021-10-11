@@ -45,6 +45,7 @@ void tween_tick(Tween *tween) {
 
 	tick_diff = tween->easing_function(tick_diff);
 
+	bool should_end = tween->current_time >= tween->duration_in_ms;
 	switch (tween->type) {
 		case TWEEN_FLOAT:
 			tween_float_tick(tween, tick_diff);
@@ -62,7 +63,7 @@ void tween_tick(Tween *tween) {
 			break;
 	}
 
-	if (tween->current_time >= tween->duration_in_ms) {
+	if (should_end) {
 		if ((!tween->always_repeat && !tween->auto_reverse) ||
 			(tween->auto_reverse && tween->is_reversing && !tween->always_repeat)) {
 			if (tween->ending_callback)
