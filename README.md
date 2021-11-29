@@ -7,6 +7,22 @@ You can either [download the code from GitHub](https://github.com/stefanmielke/l
 
 ## Extensions Available
 
+- [Position](#Position)
+- [PositionInt](#PositionInt)
+- [Size](#Size)
+- [Rect](#Rect)
+- [Random](#Random)
+- [Range](#Range)
+- [Spritesheet Support](#Spritesheet-Support)
+- [Color Support](#Color-Support)
+- [Sprite Batch](#Sprite-Batch)
+- [Animated Sprite](#Animated-Sprite)
+- [Tiled Support](#Tiled-Support)
+- [Scene Manager](#Scene-Manager)
+- [Object Pooling (Free List)](#Object-Pooling-Free-List)
+- [Clock/Timer](#ClockTimer)
+- [Tweening](#Tweening)
+
 ### Position
 > position.h
 
