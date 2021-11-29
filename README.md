@@ -349,6 +349,32 @@ objpool_free(Point_t, pool, new_obj);
 objpool_destroy(Point_t, pool);
 ```
 
+### Clock/Timer
+
+Simple clock that enables a function to be called on fixed intervals. Can also be paused and resumed at any time.
+
+```c
+// function that will be called every X seconds
+void function_callback();
+
+Clock *clock;
+
+// initialize the clock that will be called every second
+clock = new_clock(&mem_pool, 1000, &function_callback); // with a memory pool
+clock = new_clock(NULL, 1000, &function_callback); // without a memory pool
+
+// every frame we tick it
+clock_tick(clock);
+
+// we can pause the clock, and it will not do anything when you call tick
+clock_pause(clock);
+// and also resume and it will continue from when it paused (will not call any 'missed' callbacks)
+clock_resume(clock);
+
+// frees the memory allocated on 'new_clock'. DO NOT call if using a memory pool
+clock_destroy(clock);
+```
+
 ### Tweening
 
 We support [Tweening](https://en.wikipedia.org/wiki/Inbetweening) and easing through a few functions. Easing functions were based on [MonoGame.Extended Methods](https://www.monogameextended.net/docs/features/tweening/tweening#in-easing-functions).
