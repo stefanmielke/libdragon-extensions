@@ -44,7 +44,7 @@ void menu_global_set_sprites(sprite_t *menu_sprite, sprite_t *hand_sprite,
 }
 
 Menu *menu_init(MemZone *memory_pool, uint8_t total_items, uint8_t max_items, int top, int left,
-				uint8_t item_height) {
+				uint8_t item_height, fnMenuCallback callback) {
 	Menu *menu = MEM_ALLOC(sizeof(Menu), memory_pool);
 	menu->total_items = total_items;
 	menu->items = MEM_ALLOC(sizeof(MenuItem) * total_items, memory_pool);
@@ -65,6 +65,8 @@ Menu *menu_init(MemZone *memory_pool, uint8_t total_items, uint8_t max_items, in
 	menu->left = left;
 	menu->cur_top_item = 0;
 	menu->cur_bottom_item = 0;
+
+	menu->callback = callback;
 
 	return menu;
 }
@@ -205,6 +207,9 @@ int menu_tick(Menu *menu, struct controller_data *keys_down) {
 		}
 	} else if (keys_down->c[0].A || keys_down->c[0].start) {
 		if (menu->items[menu->current_menu_option].enabled) {
+			if (menu->callback) {
+				menu->callback(menu->current_menu_option, &menu->items[menu->current_menu_option]);
+			}
 			return menu->current_menu_option;
 		}
 	} else if (keys_down->c[0].B) {

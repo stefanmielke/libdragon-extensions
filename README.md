@@ -419,13 +419,17 @@ menu_global_set_default_colors(selected, enabled, disabled, background, out_of_b
 
 // -- now to create the menu... --
 
+// callback to be used. it's optional, but improves code legibility when using sub-menus.
+void menu_callback(int option, MenuItem* item);
+
 Menu* menu;
 // create a new menu (memory_pool can be NULL if not using it)
 uint8_t total_items = 10; // max items that the menu can have
 uint8_t max_items = 5; // max items that will be displayed at any time (if more than this, there will be scrolling)
 int top = 100, left = 100; // positions on-screen of the menu
 uint8_t item_height = 16; // height in pixels that each item will have (used to calculate background bottom and scrolling)
-menu = menu_init(&memory_pool, total_items, max_items, top, left, item_height);
+menu = menu_init(&memory_pool, total_items, max_items, top, left, item_height, NULL); // not using callbacks
+menu = menu_init(&memory_pool, total_items, max_items, top, left, item_height, &menu_callback); // using callbacks
 
 // add items
 bool enabled = true; // if the item can be selected or not. color can differ baed on colors set.
@@ -448,7 +452,8 @@ menu_add_item_image(menu, custom_image_sprite, sprite_index, enabled, object);
 // ticks the menu to calculate changes to its state. should only be called when the menu is active.
 struct controller_data keys_down = get_keys_down(); // you should do this only once per frame in your normal code
 int selected_option = menu_tick(menu, &keys_down);
-// if 'selected_option >= 0' then the corresponding item was selected and you can act accordingly
+// if 'selected_option >= 0' then the corresponding item was selected and you can act accordingly.
+// if using callbacks, 'selected_option' can also be '>= 0', but the function will also be called.
 
 // render the menu
 menu_render(menu, disp);
@@ -476,8 +481,8 @@ bool display_when_on_submenu = false; // do not render parent menu if children i
 menu_init_submenus(menu, &memory_pool, total_submenus, display_when_on_submenu);
 
 // initialize 2 additional menus (skipping adding items on this example)
-Menu *menu2 = menu_init(&memory_pool, total_items, max_items, top, left, item_height);
-Menu *menu3 = menu_init(&memory_pool, total_items, max_items, top, left, item_height);
+Menu *menu2 = menu_init(&memory_pool, total_items, max_items, top, left, item_height, &callback_sub1);
+Menu *menu3 = menu_init(&memory_pool, total_items, max_items, top, left, item_height, &callback_sub2);
 
 // setting menus on the parent
 menu->submenus[0] = menu2;
@@ -492,6 +497,7 @@ menu->active_submenu = -1; // sets the parent menu ('menu') as the active.
 
 Practical usage of tick with sub-menus:
 ```c
+// not using callbacks
 int option = menu_tick(menu, &keys_down);
 if (option >= 0) {
 	if (menu->active_submenu == -1) {
@@ -516,6 +522,23 @@ if (option >= 0) {
 		MyStruct *item = menu_item->object;
 		// do something with the selected item
 	}
+}
+
+// using callbacks
+menu_tick(menu, &keys_down); // on your tick function
+
+void game_screen_menu_callback(int option, MenuItem *item) {
+	game_data->menu->active_submenu = option;
+}
+
+void game_screen_menu_decree_callback(int option, MenuItem *item) {
+	MyStruct *object = item->object;
+	// do something with the selected item
+}
+
+void game_screen_menu_buildings_callback(int option, MenuItem *item) {
+	MyStruct *object = item->object;
+	// do something with the selected item
 }
 ```
 

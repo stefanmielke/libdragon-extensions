@@ -41,6 +41,8 @@ typedef struct MenuItem {
 	void *object;
 } MenuItem;
 
+typedef void (*fnMenuCallback)(int option, MenuItem *menu_item);
+
 typedef struct Menu {
 	MenuItem *items;
 	uint8_t total_items;
@@ -64,10 +66,12 @@ typedef struct Menu {
 	int left;
 	uint8_t cur_top_item;
 	uint8_t cur_bottom_item;
+
+	fnMenuCallback callback;
 } Menu;
 
 Menu *menu_init(MemZone *memory_pool, uint8_t total_items, uint8_t max_items, int top, int left,
-				uint8_t item_height);
+				uint8_t item_height, fnMenuCallback callback);
 void menu_set_background(Menu *menu, int menu_width);
 void menu_reset_items(Menu *menu);
 void menu_set_hand(Menu *menu, int hand_position_x, int hand_position_y_offset);
