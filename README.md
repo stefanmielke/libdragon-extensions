@@ -21,6 +21,7 @@ You can either [download the code from GitHub](https://github.com/stefanmielke/l
 - [Scene Manager](#Scene-Manager)
 - [Object Pooling (Free List)](#Object-Pooling-Free-List)
 - [Clock/Timer](#ClockTimer)
+- [Menu](#Menu)
 - [Tweening](#Tweening)
 
 ### Position
@@ -366,6 +367,7 @@ objpool_destroy(Point_t, pool);
 ```
 
 ### Clock/Timer
+> clock.h
 
 Simple clock that enables a function to be called on fixed intervals. Can also be paused and resumed at any time.
 
@@ -389,6 +391,142 @@ clock_resume(clock);
 
 // frees the memory allocated on 'new_clock'. DO NOT call if using a memory pool
 clock_destroy(clock);
+```
+
+### Menu
+> menu.h
+
+Supports a simple menu with background rendering and scrolling. Uses basic text rendering.
+
+To understand the basic texture used, see `sample_assets/menu.png`.
+
+```c
+// -- initializing global variables used by every menu --
+
+// main init function
+// (required to set default colors, can omit if setting colors using `menu_global_set_default_colors` or setting colors for items)
+menu_global_init();
+
+// initializes the sprites and offsets used. only required if using them (when creating the menu)
+menu_global_set_sprites(menu_sprite, hand_sprite, hand_sprite_offset);
+
+// optionally overriding the default colors
+uint32_t selected = graphics_make_color(0, 0, 0, 255);
+//... ommiting the other colors, but you can use the function above to set each color
+menu_global_set_default_colors(selected, enabled, disabled, background, out_of_bounds, menu_background);
+
+// -- now to create the menu... --
+
+Menu* menu;
+// create a new menu (memory_pool can be NULL if not using it)
+uint8_t total_items = 10; // max items that the menu can have
+uint8_t max_items = 5; // max items that will be displayed at any time (if more than this, there will be scrolling)
+int top = 100, left = 100; // positions on-screen of the menu
+uint8_t item_height = 16; // height in pixels that each item will have (used to calculate background bottom and scrolling)
+menu = menu_init(&memory_pool, total_items, max_items, top, left, item_height);
+
+// add items
+bool enabled = true; // if the item can be selected or not. color can differ baed on colors set.
+void *object = &my_custom_object; // this can be held to be retrieved later for custom actions baed on selected item.
+
+// adding simple text items
+menu_add_item(menu, "Item 1", enabled, object); // with object
+menu_add_item(menu, "Item 2", false, NULL); // no object here, forcing disabled
+
+// adding colored item (can use different colors for each item)
+uint32_t color_selected = graphics_make_color(0, 0, 0, 255);
+// omitting other colors...
+menu_add_item_colored(menu, "Item 3", enabled, color_selected, color_enabled, color_disabled, object);
+
+// adding item as an image instead of text
+sprite_t *custom_image_sprite; // custom sprite to be used by the item
+int sprite_index = 2; // index for the custom sprite
+menu_add_item_image(menu, custom_image_sprite, sprite_index, enabled, object);
+
+// ticks the menu to calculate changes to its state. should only be called when the menu is active.
+struct controller_data keys_down = get_keys_down(); // you should do this only once per frame in your normal code
+int selected_option = menu_tick(menu, &keys_down);
+// if 'selected_option >= 0' then the corresponding item was selected and you can act accordingly
+
+// render the menu
+menu_render(menu, disp);
+
+// -- optional set-up steps: --
+
+// add hand cursor
+int hand_position_x = 105; // X position of the hand. this will never change.
+int hand_position_y_offset = 5; // offset in pixels to be applied to the sprite when rendering the hand.
+menu_set_hand(menu, hand_position_x, hand_position_y_offset);
+
+// add background
+int menu_width = 200; // width in pixels of the menu. this will be the same regardless of the item width.
+menu_set_background(menu, menu_width);
+```
+
+**Sub-menus**
+
+Can be used to support N amount of nested menus without losing state on the parent menus. They are automatically ticked when ticking the parent, but the state is not set automatically (eg.: going from one menu to ther other).
+
+```c
+// initialize the amount of sub-menus used (memory pool can be NULL if not using)
+uint8_t total_submenus = 2; // amount of sub-menus that will be used (maximum)
+bool display_when_on_submenu = false; // do not render parent menu if children is selected.
+menu_init_submenus(menu, &memory_pool, total_submenus, display_when_on_submenu);
+
+// initialize 2 additional menus (skipping adding items on this example)
+Menu *menu2 = menu_init(&memory_pool, total_items, max_items, top, left, item_height);
+Menu *menu3 = menu_init(&memory_pool, total_items, max_items, top, left, item_height);
+
+// setting menus on the parent
+menu->submenus[0] = menu2;
+menu->submenus[1] = menu3;
+
+// setting a sub-menu
+menu->active_submenu = 0; // sets the active menu as 'menu2'.
+menu->active_submenu = -1; // sets the parent menu ('menu') as the active.
+```
+
+**Examples**
+
+Practical usage of tick with sub-menus:
+```c
+int option = menu_tick(menu, &keys_down);
+if (menu->active_submenu == -1) {
+	// is currently on main menu, just 2 submenus
+	switch (option) {
+		case 0:
+		case 1:
+			// setting the sub-menu according to the chosen item
+			menu->active_submenu = option;
+			break;
+		default:
+			break;
+	}
+} else if (menu->active_submenu == 0) {
+	// is currently on first sub-menu
+	MenuItem *menu_item = &menu->submenus[0]->items[option];
+	// making sure item is enabled
+	if (menu_item->enabled) {
+		MyStruct *item = menu_item->object;
+		// do something with the selected item
+	}
+} else if (menu->active_submenu == 1) {
+	// is currently on second sub-menu
+	MenuItem *menu_item = &menu->submenus[1]->items[option];
+	// making sure item is enabled
+	if (menu_item->enabled) {
+		MyStruct *item = menu_item->object;
+		// do something with the selected item
+	}
+}
+```
+
+How to use the custom object?
+```c
+// getting the current option (can also be the result of 'menu_tick')
+int selected_item = menu->current_menu_option;
+// get the object stored for that MenuItem
+MyStruct *object = menu->items[selected_item].object;
 ```
 
 ### Tweening
