@@ -396,7 +396,7 @@ clock_destroy(clock);
 ### Menu
 > menu.h
 
-Supports a simple menu with background rendering and scrolling. Uses basic text rendering.
+Supports a simple menu with background rendering, scrolling, and nested sub-menus. Uses basic text rendering.
 
 The interaction with the menu occurs by using 'A' or 'START' to select and 'B' to exit a sub-menu.
 
@@ -472,7 +472,7 @@ menu_set_background(menu, menu_width);
 
 **Sub-menus**
 
-Can be used to support N amount of nested menus without losing state on the parent menus. They are automatically ticked when ticking the parent, but the state is not set automatically (eg.: going from one menu to ther other).
+Can be used to support N amount of nested menus without losing state on the parent menus. They are automatically ticked when ticking the parent, but the state is not set automatically (eg.: going from one menu to the other).
 
 ```c
 // initialize the amount of sub-menus used (memory pool can be NULL if not using)
