@@ -398,6 +398,8 @@ clock_destroy(clock);
 
 Supports a simple menu with background rendering and scrolling. Uses basic text rendering.
 
+The interaction with the menu occurs by using 'A' or 'START' to select and 'B' to exit a sub-menu.
+
 To understand the basic texture used, see `sample_assets/menu.png`.
 
 ```c
@@ -491,30 +493,26 @@ menu->active_submenu = -1; // sets the parent menu ('menu') as the active.
 Practical usage of tick with sub-menus:
 ```c
 int option = menu_tick(menu, &keys_down);
-if (menu->active_submenu == -1) {
-	// is currently on main menu, just 2 submenus
-	switch (option) {
-		case 0:
-		case 1:
-			// setting the sub-menu according to the chosen item
-			menu->active_submenu = option;
-			break;
-		default:
-			break;
-	}
-} else if (menu->active_submenu == 0) {
-	// is currently on first sub-menu
-	MenuItem *menu_item = &menu->submenus[0]->items[option];
-	// making sure item is enabled
-	if (menu_item->enabled) {
+if (option >= 0) {
+	if (menu->active_submenu == -1) {
+		// is currently on main menu, just 2 submenus
+		switch (option) {
+			case 0:
+			case 1:
+				// setting the sub-menu according to the chosen item
+				menu->active_submenu = option;
+				break;
+			default:
+				break;
+		}
+	} else if (menu->active_submenu == 0) {
+		// is currently on first sub-menu
+		MenuItem *menu_item = &menu->submenus[0]->items[option];
 		MyStruct *item = menu_item->object;
 		// do something with the selected item
-	}
-} else if (menu->active_submenu == 1) {
-	// is currently on second sub-menu
-	MenuItem *menu_item = &menu->submenus[1]->items[option];
-	// making sure item is enabled
-	if (menu_item->enabled) {
+	} else if (menu->active_submenu == 1) {
+		// is currently on second sub-menu
+		MenuItem *menu_item = &menu->submenus[1]->items[option];
 		MyStruct *item = menu_item->object;
 		// do something with the selected item
 	}
