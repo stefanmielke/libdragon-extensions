@@ -30,7 +30,7 @@ typedef struct {
 } AnimatedSprite;
 
 /**
- * @brief
+ * @brief Allocates and returns a new AnimatedSprite object.
  *
  * @param memory_pool
  *        MemZone to use when allocating memory.
