@@ -106,6 +106,8 @@ typedef struct Menu {
 	/// Width of the background. Configured using 'menu_set_background'.
 	int menu_width;
 
+	/// If the hand should be displayed for this menu
+	bool display_hand;
 	/// X position of the hand cursor. Configured using 'menu_global_set_sprites' and
 	/// 'menu_set_hand'.
 	int hand_position_x;

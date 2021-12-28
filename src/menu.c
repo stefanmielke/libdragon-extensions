@@ -68,6 +68,10 @@ Menu *menu_init(MemZone *memory_pool, uint8_t total_items, uint8_t max_items, in
 
 	menu->callback = callback;
 
+	menu->display_hand = false;
+	menu->hand_position_x = 0;
+	menu->hand_position_y_offset = 0;
+
 	return menu;
 }
 
@@ -87,6 +91,7 @@ void menu_reset_items(Menu *menu) {
 }
 
 void menu_set_hand(Menu *menu, int hand_position_x, int hand_position_y_offset) {
+	menu->display_hand = true;
 	menu->hand_position_x = hand_position_x;
 	menu->hand_position_y_offset = hand_position_y_offset;
 }
@@ -293,7 +298,7 @@ void menu_render(Menu *menu, display_context_t disp) {
 	}
 
 	// render hand icon
-	if (menu->current_add_index > 0) {
+	if (menu->display_hand && menu->current_add_index > 0) {
 		int option = menu->current_menu_option;
 		if (menu->current_add_index > 0)
 			graphics_draw_sprite_trans_stride(disp, menu->hand_position_x,
