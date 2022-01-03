@@ -4,6 +4,10 @@
 #include "mem_pool.h"
 #include "rect.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Struct that holds a SpriteBatch.
  */
@@ -60,3 +64,7 @@ void sprite_batch_draw(SpriteBatch *sprite_batch, int offset, Rect screen_rect);
  *        SpriteBatch to destroy.
  */
 void sprite_batch_destroy(SpriteBatch *sprite_batch);
+
+#ifdef __cplusplus
+}
+#endif

@@ -4,6 +4,10 @@
 
 #include "mem_pool.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Enum with the order of the background sprites in a texture. Any texture has to have this
  * order.
@@ -321,3 +325,7 @@ void menu_global_set_sprites(sprite_t *menu_sprite, sprite_t *hand_sprite,
 void menu_global_set_default_colors(uint32_t selected, uint32_t enabled, uint32_t disabled,
 									uint32_t background, uint32_t out_of_bounds,
 									uint32_t menu_background);
+
+#ifdef __cplusplus
+}
+#endif

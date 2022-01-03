@@ -3,6 +3,10 @@
 #include <malloc.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief A contiguous zone where memory can be allocated.
  */
@@ -39,3 +43,7 @@ void *mem_zone_alloc(MemZone *memory_zone, size_t size);
  * @param memory_zone MemZone to use.
  */
 void mem_zone_free_all(MemZone *memory_zone);
+
+#ifdef __cplusplus
+}
+#endif

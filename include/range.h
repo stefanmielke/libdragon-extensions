@@ -2,6 +2,10 @@
 
 #include "random.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Struct that has a float range.
  */
@@ -49,3 +53,7 @@ inline RangeFloat new_range_float_same(float start_and_end) {
 inline float range_get_from_float(RangeFloat *range) {
 	return RANDRF(range->start, range->end);
 }
+
+#ifdef __cplusplus
+}
+#endif

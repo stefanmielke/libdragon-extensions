@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Struct that has a position with int values.
  */
@@ -47,3 +51,7 @@ inline PositionInt new_position_int(int x, int y) {
 	pos.y = y;
 	return pos;
 }
+
+#ifdef __cplusplus
+}
+#endif

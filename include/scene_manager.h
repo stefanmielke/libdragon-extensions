@@ -3,6 +3,10 @@
 #include <libdragon.h>
 #include "mem_pool.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Called by scene_manager_tick after fnSMSceneChangeCallback.
  */
@@ -127,3 +131,7 @@ void scene_manager_display(SceneManager *scene_manager, display_context_t disp);
  *        SceneManager to destroy.
  */
 void scene_manager_destroy(SceneManager *scene_manager);
+
+#ifdef __cplusplus
+}
+#endif

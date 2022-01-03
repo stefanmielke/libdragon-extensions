@@ -5,6 +5,10 @@
 #include "rect.h"
 #include "position_int.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Struct the positions of a single tile type.
  */
@@ -65,3 +69,7 @@ void tiled_cached_render(TiledCached *tiled, Rect screen_rect);
  *        TiledCached to destroy.
  */
 void tiled_cached_destroy(TiledCached *tiled);
+
+#ifdef __cplusplus
+}
+#endif

@@ -4,6 +4,10 @@
 
 #include "mem_pool.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Function used as a base for the callback. Example: 'void my_callback();'
  */
@@ -73,3 +77,7 @@ void clock_resume(Clock *clock);
  *        Reference to the Clock object that will be destroyed.
  */
 void clock_destroy(Clock *clock);
+
+#ifdef __cplusplus
+}
+#endif

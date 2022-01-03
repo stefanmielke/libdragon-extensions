@@ -4,6 +4,10 @@
 #include "mem_pool.h"
 #include "rect.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Struct that holds a Tiled map.
  */
@@ -71,3 +75,7 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect);
  *        Tiled to destroy.
  */
 void tiled_destroy(Tiled *tiled);
+
+#ifdef __cplusplus
+}
+#endif

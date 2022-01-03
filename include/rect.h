@@ -4,6 +4,10 @@
 #include "position.h"
 #include "size.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Struct that has a position and a size.
  */
@@ -54,3 +58,7 @@ inline bool contains(Rect inner, Rect outer) {
 		   inner.pos.y >= outer.pos.y &&
 		   inner.pos.y + inner.size.height <= outer.pos.y + outer.size.height;
 }
+
+#ifdef __cplusplus
+}
+#endif

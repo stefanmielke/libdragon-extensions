@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 float easing_linear(float value);
 float easing_cubic_in(float value);
 float easing_cubic_out(float value);
@@ -31,3 +35,7 @@ float easing_back_in_out(float value);
 float easing_bounce_in(float value);
 float easing_bounce_out(float value);
 float easing_bounce_in_out(float value);
+
+#ifdef __cplusplus
+}
+#endif

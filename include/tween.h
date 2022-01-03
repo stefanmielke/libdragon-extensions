@@ -7,6 +7,10 @@
 #include "position.h"
 #include "size.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Enum with the types of Tweens available.
  */
@@ -222,3 +226,7 @@ void tween_set_to_position(Tween *tween, Position start_value, Position end_valu
  */
 void tween_set_to_color(Tween *tween, color_t start_value, color_t end_value,
 						fnTWCallbackColor tween_callback);
+
+#ifdef __cplusplus
+}
+#endif

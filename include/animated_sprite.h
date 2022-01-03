@@ -4,6 +4,10 @@
 #include "mem_pool.h"
 #include "rect.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Struct with a sprite that can be animated.
  */
@@ -74,3 +78,7 @@ void animated_sprite_tick(AnimatedSprite *anim, float anim_rate);
  *        Rect of the current screen. Used to check if the AnimatedSprite is on the screen.
  */
 void animated_sprite_draw(AnimatedSprite *anim, Position pos, Rect screen_rect);
+
+#ifdef __cplusplus
+}
+#endif

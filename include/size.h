@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Struct that holds size.
  */
@@ -47,3 +51,7 @@ inline Size new_size(float width, float height) {
 	size.height = height;
 	return size;
 }
+
+#ifdef __cplusplus
+}
+#endif

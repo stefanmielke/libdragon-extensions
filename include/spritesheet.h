@@ -3,6 +3,10 @@
 #include <libdragon.h>
 #include "mem_pool.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Loads and allocate a sprite_t on the MemZone.
  *
@@ -28,3 +32,7 @@ inline sprite_t *spritesheet_load(MemZone *memory_pool, const char *sprite_path)
 
 	return sprite;
 }
+
+#ifdef __cplusplus
+}
+#endif
