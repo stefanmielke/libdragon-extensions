@@ -225,9 +225,11 @@ The software renderer is recommended for maps with lots of texture swaps during 
 
 The hardware rendering is preffered when there's not much texture swapping and can render maps faster than the software renderer if that's the case.
 
-The maximum map size I was able to load was 50x50, so take that into consideration as well.
-
 ```c
+// set screen and view positions
+Position view_position = new_position(0, 0); // this is the position on the screen that it will be rendered
+Rect screen_rect = {{0, 0}, {320, 240}}; // if we want to move the map, we change 'screen.pos'
+
 // load the map
 Size grid_size = new_size(50, 50); // map tiles: 50x50
 Size tile_size = new_size_same(16); // tile size: 16x16
@@ -235,11 +237,25 @@ Tiled *tile_test = tiled_init(&memory_pool, tile_sprite, "/path/to/map.map", gri
 // using malloc instead of memory pool
 Tiled *tile_test = tiled_init(NULL, tile_sprite, "/path/to/map.map", grid_size, tile_size);
 
-// Render the map (software renderer)
-tiled_render(disp, tile_test, screen_rect);
+// Setting an offset for the map - useful for rendering multiple maps (default is 0,0)
+tiled_set_render_offset(tile_test, new_position(100, 100));
 
-// Render the map (hardware renderer)
-tiled_render_rdp(tile_test, screen_rect);
+// Render the map (software renderer - any texture size)
+tiled_render(disp, tile_test, screen_rect, view_position);
+
+// Render the map (hardware renderer - any texture size)
+tiled_render_rdp(tile_test, screen_rect, view_position);
+
+// Render the map (hardware renderer - max texture size is 4KB)
+tiled_render_fast(tile_test, screen_rect, view_position);
+
+// Render the map (hardware renderer - max texture size is 4KB)
+// This uses a mirrored texture to support more tiles than it should.
+// See examples under "/sample_assets".
+// "tileset_ingame.png" is the one that's loaded in the game.
+// "tileset_mirror.png" is used inside Tiled.
+// Another pair of textures are "tileset_example_*.png" that uses 16x16 tiles.
+tiled_render_fast_mirror(tile_test, screen_rect, view_position);
 
 // if not using memory pool (and only if not using), you have to call destroy to free the memory used
 tiled_destroy(tile_test);
