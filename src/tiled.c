@@ -128,8 +128,8 @@ void tiled_render_fast(Tiled *tiled, Rect screen_rect, Position view_position) {
 	int s = (tiled->map[tile] % tiled->sprite->hslices) * tiled->tile_size.width;
 	int t = (tiled->map[tile] / tiled->sprite->hslices) * tiled->tile_size.height;
 	rdp_draw_textured_rectangle_scaled_text_coord(
-		0, screen_x, screen_y, screen_x + tiled->tile_size.width,
-		screen_y + tiled->tile_size.height, 1, 1, s, t, MIRROR_DISABLED);
+		0, screen_x, screen_y, screen_x + tiled->tile_size.width - 1,
+		screen_y + tiled->tile_size.height - 1, 1, 1, s, t, MIRROR_DISABLED);
 
 	END_LOOP()
 }
@@ -147,8 +147,8 @@ void tiled_render_fast_mirror(Tiled *tiled, Rect screen_rect, Position view_posi
 	int s = (tiled->map[tile] % (tiled->sprite->hslices * 2)) * tiled->tile_size.width;
 	int t = (tiled->map[tile] / (tiled->sprite->hslices * 2)) * tiled->tile_size.height;
 	rdp_draw_textured_rectangle_scaled_text_coord(
-		0, screen_x, screen_y, screen_x + tiled->tile_size.width,
-		screen_y + tiled->tile_size.height, 1, 1, s, t, MIRROR_DISABLED);
+		0, screen_x, screen_y, screen_x + tiled->tile_size.width - 1,
+		screen_y + tiled->tile_size.height - 1, 1, 1, s, t, MIRROR_DISABLED);
 
 	END_LOOP()
 }
