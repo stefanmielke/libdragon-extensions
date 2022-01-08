@@ -635,8 +635,11 @@ tween_destroy(tween);
 Simple CSV reader to read files from DFS into arrays.
 
 ```c
-int output_array[SIZE_OF_ARRAY];
+int output_array_ints[SIZE_OF_ARRAY];
 csv_reader_from_ints("path/to/csv_file.csv", SIZE_OF_ARRAY, output_array);
+
+char output_array_chars[SIZE_OF_ARRAY];
+csv_reader_from_chars("path/to/csv_file.csv", SIZE_OF_ARRAY, output_array);
 ```
 
 ## More Examples

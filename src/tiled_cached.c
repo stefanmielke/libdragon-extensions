@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include "../include/csv_reader.h"
+
 TiledCached *tiled_cached_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path,
 							   Size map_size, Size tile_size) {
 	TiledCached *tiled_map = NULL;
@@ -17,23 +19,8 @@ TiledCached *tiled_cached_init(MemZone *memory_pool, sprite_t *sprite, const cha
 	char *map = malloc(map_size.width * map_size.height);
 	memset(map, -1, map_size.width * map_size.height);
 
-	// read file from dfs
-	const char *tok;
-	int fp = dfs_open(map_path);
-
-	char *buffer = malloc(dfs_size(fp));
-	int bytes_read;
-	size_t i = 0;
-	while ((bytes_read = dfs_read(buffer, sizeof(char), dfs_size(fp), fp)) > 0 &&
-		   i < map_size.width * map_size.height) {
-		for (tok = strtok(buffer, ","); tok && *tok; tok = strtok(NULL, ",\n\r")) {
-			map[i] = (char)atoi(tok);
-			++i;
-		}
-	}
-
-	free(buffer);
-	dfs_close(fp);
+	// load map from csv
+	csv_reader_from_chars(map_path, map_size.width * map_size.height, map);
 
 	// naive lookup
 	for (size_t i = 0; i < 255; ++i) {

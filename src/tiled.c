@@ -1,6 +1,7 @@
 #include "../include/tiled.h"
 
 #include <string.h>
+#include "../include/csv_reader.h"
 #include "../include/memory_alloc.h"
 
 #define FILE_BUFFER_SIZE 100
@@ -56,23 +57,8 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 	tiled_map->map = MEM_ALLOC(map_size.width * map_size.height, memory_pool);
 	memset(tiled_map->map, -1, map_size.width * map_size.height);
 
-	// read file from dfs
-	const char *tok;
-	int fp = dfs_open(map_path);
-
-	char *buffer = malloc(dfs_size(fp));
-	int bytes_read;
-	size_t i = 0;
-	while ((bytes_read = dfs_read(buffer, sizeof(char), dfs_size(fp), fp)) > 0 &&
-		   i < map_size.width * map_size.height) {
-		for (tok = strtok(buffer, ","); tok && *tok; tok = strtok(NULL, ",\n\r")) {
-			tiled_map->map[i] = (char)atoi(tok);
-			++i;
-		}
-	}
-
-	free(buffer);
-	dfs_close(fp);
+	// read map from file
+	csv_reader_from_chars(map_path, map_size.width * map_size.height, tiled_map->map);
 
 	return tiled_map;
 }
