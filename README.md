@@ -23,6 +23,7 @@ You can either [download the code from GitHub](https://github.com/stefanmielke/l
 - [Clock/Timer](#ClockTimer)
 - [Menu](#Menu)
 - [Tweening](#Tweening)
+- [CSV Reader](#CSV-Reader)
 
 ### Position
 > position.h
@@ -627,6 +628,15 @@ tween_tick(tween);
 
 // destroying the tween (unnecessary but safe when using a memory pool)
 tween_destroy(tween);
+```
+
+### CSV Reader
+
+Simple CSV reader to read files from DFS into arrays.
+
+```c
+int output_array[SIZE_OF_ARRAY];
+csv_reader_from_ints("path/to/csv_file.csv", SIZE_OF_ARRAY, output_array);
 ```
 
 ## More Examples
