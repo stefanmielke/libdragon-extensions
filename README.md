@@ -24,6 +24,7 @@ You can either [download the code from GitHub](https://github.com/stefanmielke/l
 - [Menu](#Menu)
 - [Tweening](#Tweening)
 - [CSV Reader](#CSV-Reader)
+- [Font Rendering](#Font-Rendering)
 
 ### Position
 > position.h
@@ -656,6 +657,24 @@ csv_reader_from_ints("path/to/csv_file.csv", SIZE_OF_ARRAY, output_array);
 
 char output_array_chars[SIZE_OF_ARRAY];
 csv_reader_from_chars("path/to/csv_file.csv", SIZE_OF_ARRAY, output_array);
+```
+
+### Font Rendering
+
+Renders text using a sprite font that you load. Has the same functionality as libdragon's `graphics_draw_text` but supports different fonts.
+
+```c
+sprite_t *font_large; // sprite with the font.
+int tab_width = 4; // amount of empty characters to use when rendering a '\t'.
+
+// loads the font
+graphics_set_font(font_large, tab_width);
+
+// sets the text and background colors (optional)
+graphics_set_color_font(TEXT_COLOR, BACKGROUND_COLOR);
+
+// renders the text on screen
+graphics_draw_text_font(disp, 20, 20, "Using new font!");
 ```
 
 ## More Examples
