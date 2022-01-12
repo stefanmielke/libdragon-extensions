@@ -44,7 +44,7 @@ void graphics_draw_text_font(display_context_t disp, int x, int y, const char *c
  * Draw a character from the built-in font to the screen.  This function does not support alpha
  * blending, only binary transparency.  If the background color is fully transparent, the font is
  * drawn with no background.  Otherwise, the font is drawn on a fully colored background.  The
- * foreground and background can be set using #graphics_set_color.
+ * foreground and background can be set using #graphics_set_color_font.
  *
  * @param[in] disp
  *            The currently active display context.
