@@ -585,6 +585,7 @@ MyStruct *object = menu->items[selected_item].object;
 ```
 
 ### Tweening
+> tween.h | easing.h
 
 We support [Tweening](https://en.wikipedia.org/wiki/Inbetweening) and easing through a few functions. Easing functions were based on [MonoGame.Extended Methods](https://www.monogameextended.net/docs/features/tweening/tweening#in-easing-functions).
 
@@ -648,6 +649,7 @@ tween_destroy(tween);
 ```
 
 ### CSV Reader
+> csv_reader.h
 
 Simple CSV reader to read files from DFS into arrays.
 
@@ -660,6 +662,7 @@ csv_reader_from_chars("path/to/csv_file.csv", SIZE_OF_ARRAY, output_array);
 ```
 
 ### Font Rendering
+> font.h
 
 Renders text using a sprite font that you load. Has the same functionality as libdragon's `graphics_draw_text` but supports different fonts.
 
