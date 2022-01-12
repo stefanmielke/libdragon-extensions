@@ -58,6 +58,28 @@ AnimatedSprite *animated_sprite_init(MemZone *memory_pool, sprite_t *sprite, Siz
 									 float anim_speed);
 
 /**
+ * @brief Initializes the AnimatedSprite sent. Will not allocate memory for 'anim'.
+ *
+ * @param anim
+ *        Already allocated AnimatedSprite.
+ * @param sprite
+ *        The sprite that will be used to render. Should have all the frames.
+ * @param size
+ *        Size of each frame.
+ * @param render_offset
+ *        Offset to be used when rendering.
+ * @param offset_start
+ *        Offset of the first frame.
+ * @param offset_end
+ *        Offset of the last frame.
+ * @param anim_speed
+ *        Speed of the animation in ms.
+ */
+void animated_sprite_init_no_alloc(AnimatedSprite *anim, sprite_t *sprite, Size size,
+								   Position render_offset, size_t offset_start, size_t offset_end,
+								   float anim_speed);
+
+/**
  * @brief Updates the animation. Should be called on every frame.
  *
  * @param anim

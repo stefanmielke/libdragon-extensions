@@ -6,6 +6,15 @@ AnimatedSprite *animated_sprite_init(MemZone *memory_pool, sprite_t *sprite, Siz
 									 Position render_offset, size_t offset_start, size_t offset_end,
 									 float anim_speed) {
 	AnimatedSprite *anim = mem_zone_alloc(memory_pool, sizeof(AnimatedSprite));
+	animated_sprite_init_no_alloc(anim, sprite, size, render_offset, offset_start, offset_end,
+								  anim_speed);
+
+	return anim;
+}
+
+void animated_sprite_init_no_alloc(AnimatedSprite *anim, sprite_t *sprite, Size size,
+								   Position render_offset, size_t offset_start, size_t offset_end,
+								   float anim_speed) {
 	anim->sprite = sprite;
 	anim->offset_start = offset_start;
 	anim->offset_end = offset_end;
@@ -16,8 +25,6 @@ AnimatedSprite *animated_sprite_init(MemZone *memory_pool, sprite_t *sprite, Siz
 	anim->_current_offset = offset_start;
 	anim->_last_tick = get_ticks_ms();
 	anim->_ticks = 0;
-
-	return anim;
 }
 
 void animated_sprite_tick(AnimatedSprite *anim, float anim_rate) {

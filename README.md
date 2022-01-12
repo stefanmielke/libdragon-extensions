@@ -189,6 +189,10 @@ size_t first_frame = 0, last_frame = 4;
 AnimatedSprite *anim =
     animated_sprite_init(&memory_pool, sprites, new_size_zero(), new_position_zero(), first_frame, last_frame, anim_speed);
 
+// initialize a pre-allocated AnimatedSprite
+AnimatedSprite anim; // no pointer here (you could have allocated using malloc or similar, but you cannot send a NULL pointer to the function)
+animated_sprite_init_no_alloc(&anim, sprites, new_size_zero(), new_position_zero(), first_frame, last_frame, anim_speed);
+
 // tick
 float anim_rate = 1; // how fast the animation should run on this tick
 animated_sprite_tick(anim, anim_rate);
