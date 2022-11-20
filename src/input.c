@@ -30,7 +30,8 @@ bool input_is_controller_connected(uint8_t id) {
 	}
 }
 
-void input_init(MemZone *global_memory_pool, uint8_t actions_max_count, uint8_t actions_max_bindings_count) {
+void input_init(MemZone *global_memory_pool, uint8_t actions_max_count,
+				uint8_t actions_max_bindings_count) {
 	controller_init();
 
 	input = MEM_ALLOC(sizeof(Input), global_memory_pool);
@@ -39,7 +40,8 @@ void input_init(MemZone *global_memory_pool, uint8_t actions_max_count, uint8_t 
 	input->actions_max_events_count = actions_max_count;
 	input->actions_max_bindings_count = actions_max_bindings_count;
 
-	input_action_events = mem_zone_alloc(global_memory_pool, sizeof(InputActionEvent *) * actions_max_count);
+	input_action_events = mem_zone_alloc(global_memory_pool,
+										 sizeof(InputActionEvent *) * actions_max_count);
 	input_action_bindings = MEM_ALLOC(sizeof(InputActionBinding *) * actions_max_bindings_count,
 									  global_memory_pool);
 
@@ -130,6 +132,9 @@ void input_update() {
 			}
 
 			for (uint8_t j = 0; j < input->current_action_events; ++j) {
+				if (input_action_events[j]->is_paused)
+					continue;
+
 				if (input_action_events[j]->controller_id == controller_id &&
 					input_action_events[j]->action_id == input_action_bindings[i]->action_id &&
 					input_button_is_on_state(controller_id, input_action_bindings[i]->button,
@@ -142,6 +147,9 @@ void input_update() {
 	}
 
 	for (uint8_t event_id = 0; event_id < input->current_axis_events; ++event_id) {
+		if (input_axis_events[event_id]->is_paused)
+			continue;
+
 		if (!input_is_controller_connected(input_axis_events[event_id]->controller_id))
 			continue;
 
@@ -248,4 +256,40 @@ void input_add_axis_binding(MemZone *global_memory_pool, gamepad_button button, 
 	input_axis_bindings[cur_action]->action_id = action_id;
 
 	input->current_axis_bindings++;
+}
+
+void input_axis_event_pause(uint8_t action_id) {
+	for (uint8_t i = 0; i < input->current_axis_events; ++i) {
+		if (input_axis_events[i]->action_id == action_id) {
+			input_axis_events[i]->is_paused = true;
+			return;
+		}
+	}
+}
+
+void input_axis_event_resume(uint8_t action_id) {
+	for (uint8_t i = 0; i < input->current_axis_events; ++i) {
+		if (input_axis_events[i]->action_id == action_id) {
+			input_axis_events[i]->is_paused = false;
+			return;
+		}
+	}
+}
+
+void input_action_event_pause(uint8_t action_id) {
+	for (uint8_t i = 0; i < input->current_action_events; ++i) {
+		if (input_action_events[i]->action_id == action_id) {
+			input_action_events[i]->is_paused = true;
+			return;
+		}
+	}
+}
+
+void input_action_event_resume(uint8_t action_id) {
+	for (uint8_t i = 0; i < input->current_axis_events; ++i) {
+		if (input_action_events[i]->action_id == action_id) {
+			input_action_events[i]->is_paused = false;
+			return;
+		}
+	}
 }

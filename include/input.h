@@ -26,6 +26,8 @@ typedef struct InputActionEvent {
 	void *instance;
 	/// type of the trigger (when the button is pressed or released)
 	gamepad_button_state state;
+	/// if this event will not generate callbacks
+	bool is_paused;
 } InputActionEvent;
 
 typedef struct InputActionBinding {
@@ -44,6 +46,8 @@ typedef struct InputAxisEvent {
 	fnIInputAxisCallback axis_callback;
 	/// user object/state that will be passed to the callback.
 	void *instance;
+	/// if this event will not generate callbacks
+	bool is_paused;
 } InputAxisEvent;
 
 typedef struct InputAxisBinding {
@@ -215,3 +219,31 @@ void input_add_action_binding(MemZone *global_memory_pool, gamepad_button button
  */
 void input_add_axis_binding(MemZone *global_memory_pool, gamepad_button button, float scale,
 							uint8_t action_id);
+
+/**
+ * @brief Pause all axis callbacks for a given action. Call input_axis_event_resume to resume.
+ * 
+ * @param action_id Id of the action that will be paused.
+ */
+void input_axis_event_pause(uint8_t action_id);
+
+/**
+ * @brief Resume all axis callbacks for a given action. Call input_axis_event_pause to pause again.
+ * 
+ * @param action_id Id of the action that will be resumed.
+ */
+void input_axis_event_resume(uint8_t action_id);
+
+/**
+ * @brief Pause all action callbacks for a given action. Call input_action_event_resume to resume.
+ * 
+ * @param action_id Id of the action that will be paused.
+ */
+void input_action_event_pause(uint8_t action_id);
+
+/**
+ * @brief Resume all action callbacks for a given action. Call input_action_event_pause to pause again.
+ * 
+ * @param action_id Id of the action that will be resumed.
+ */
+void input_action_event_resume(uint8_t action_id);

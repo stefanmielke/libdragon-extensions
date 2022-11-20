@@ -692,6 +692,16 @@ bool controller_1_connected = input_is_controller_connected(1);
 bool controller_2_connected = input_is_controller_connected(2);
 bool controller_3_connected = input_is_controller_connected(3);
 bool controller_4_connected = input_is_controller_connected(4);
+
+// pause all callbacks for EV_MOVE_HOR, EV_MOVE_VERT, and EV_ATTACK events.
+input_axis_event_pause(EV_MOVE_HOR);
+input_axis_event_pause(EV_MOVE_VERT);
+input_action_event_pause(EV_ATTACK);
+
+// resume all callbacks for EV_MOVE_HOR, EV_MOVE_VERT, and EV_ATTACK events.
+input_axis_event_resume(EV_MOVE_HOR);
+input_axis_event_resume(EV_MOVE_VERT);
+input_action_event_resume(EV_ATTACK);
 ```
 
 ## More Examples
