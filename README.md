@@ -682,6 +682,9 @@ input_add_action_binding(&mem_pool, gp_R, EV_DEFEND);
 // you can remove all bindings using the function below.
 // don't forget to re-add all bindings (but not the events) after calling this function.
 input_remove_all_bindings();
+
+// have to be called every frame. it will update all controller information and call the events when they happen.
+input_update()
 ```
 
 ## More Examples
