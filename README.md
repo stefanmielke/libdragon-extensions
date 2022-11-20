@@ -23,6 +23,7 @@ You can either [download the code from GitHub](https://github.com/stefanmielke/l
 - [Clock/Timer](#ClockTimer)
 - [Menu](#Menu)
 - [Tweening](#Tweening)
+- [Input](#Input)
 
 ### Position
 > position.h
@@ -551,6 +552,7 @@ MyStruct *object = menu->items[selected_item].object;
 ```
 
 ### Tweening
+> tween.h | easing.h
 
 We support [Tweening](https://en.wikipedia.org/wiki/Inbetweening) and easing through a few functions. Easing functions were based on [MonoGame.Extended Methods](https://www.monogameextended.net/docs/features/tweening/tweening#in-easing-functions).
 
@@ -611,6 +613,75 @@ tween_tick(tween);
 
 // destroying the tween (unnecessary but safe when using a memory pool)
 tween_destroy(tween);
+```
+
+### Input
+> input.h
+
+This is an input system designed around callbacks and re-mapping that can handle all controller input for a game.
+
+```c
+// in case you want to use a memory pool, you can pass NULL on every use of this variable below if you want to use 'malloc' instead.
+MemZone mem_pool;
+mem_zone_init(&mem_pool, 1024);
+
+// the actions that will be used when registering events
+enum Actions {
+	EV_PAUSE,
+	EV_MOVE_VERT,
+	EV_MOVE_HOR,
+	EV_ATTACK,
+	EV_DEFEND,
+};
+
+// example of an action callback
+void event_pause_callback(void *instance) {
+	graphics_draw_text(disp, 10, 10, "Paused!");
+}
+// example of an axis callback
+void event_move_hor_callback(void *instance, int scale) {
+	char text[20];
+	snprintf(text, 20, "Moved Hor:%d!\n", scale);
+	graphics_draw_text(disp, 10, 70, text);
+}
+
+// initializing the input, with a maximum of 5 events and 15 callbacks that can be registered.
+// you may want to have more callbacks if the same event can be called by more than one binding.
+// e.g.: both dpad and the analog stick can move the player
+input_init(&mem_pool, 5, 15);
+// overriding the default max analog value from 60 to 80. this is the maximum value that will be passed to all axis callbacks.
+input_set_max_analog(80);
+// overriding the default deadzone from 5 to 30. this is the minimum value that will trigger any action related to the analog stick.
+input_set_deadzone(30);
+
+// registering action events (events that will be triggered once per button 'press' or 'release')
+input_add_action_event(&mem_pool, 1, EV_PAUSE, event_pause_callback, NULL, gp_pressed);
+input_add_action_event(&mem_pool, 1, EV_ATTACK, event_attack_callback, NULL, gp_released);
+input_add_action_event(&mem_pool, 1, EV_DEFEND, event_defend_callback, NULL, gp_pressed);
+
+// registering axis events (events that will trigger every frame, with either '0' or a value from 'deadzone' to 'max_analog', multiplied by the 'scale' set later)
+input_add_axis_event(&mem_pool, 1, EV_MOVE_HOR, event_move_hor_callback, NULL);
+input_add_axis_event(&mem_pool, 1, EV_MOVE_VERT, event_move_vert_callback, NULL);
+
+// binding multiple axis to actions
+input_add_axis_binding(&mem_pool, gp_analog_horizontal, 1, EV_MOVE_HOR);
+input_add_axis_binding(&mem_pool, gp_left, -1, EV_MOVE_HOR); // here you can see how to use a button to an axis callback
+input_add_axis_binding(&mem_pool, gp_right, 1, EV_MOVE_HOR);
+input_add_axis_binding(&mem_pool, gp_analog_vertical, 1, EV_MOVE_VERT);
+input_add_axis_binding(&mem_pool, gp_up, 1, EV_MOVE_VERT);
+input_add_axis_binding(&mem_pool, gp_down, -1, EV_MOVE_VERT);
+
+// binding multiple buttons to actions
+input_add_action_binding(&mem_pool, gp_start, EV_PAUSE);
+input_add_action_binding(&mem_pool, gp_A, EV_ATTACK);
+input_add_action_binding(&mem_pool, gp_Z, EV_ATTACK); // you can register multiple buttons to the same action
+input_add_action_binding(&mem_pool, gp_L, EV_ATTACK);
+input_add_action_binding(&mem_pool, gp_B, EV_DEFEND);
+input_add_action_binding(&mem_pool, gp_R, EV_DEFEND);
+
+// you can remove all bindings using the function below.
+// don't forget to re-add all bindings (but not the events) after calling this function.
+input_remove_all_bindings();
 ```
 
 ## More Examples
