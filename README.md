@@ -685,6 +685,13 @@ input_remove_all_bindings();
 
 // have to be called every frame. it will update all controller information and call the events when they happen.
 input_update()
+
+// you can use the function below to know if a controller is connected.
+// it should update the connected controllers around every second.
+bool controller_1_connected = input_is_controller_connected(1);
+bool controller_2_connected = input_is_controller_connected(2);
+bool controller_3_connected = input_is_controller_connected(3);
+bool controller_4_connected = input_is_controller_connected(4);
 ```
 
 ## More Examples
