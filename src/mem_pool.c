@@ -15,6 +15,8 @@ void mem_zone_init(MemZone *z, size_t size) {
 	z->start = z->pos;
 	z->end = z->start + size;
 
+	memset(z->start, 0, size);
+
 	enable_interrupts();
 }
 
