@@ -654,37 +654,45 @@ input_set_max_analog(80);
 // overriding the default deadzone from 5 to 30. this is the minimum value that will trigger any action related to the analog stick.
 input_set_deadzone(30);
 
+// you can set an object per controller that will sent back on the callbacks associated with that controller.
+// you can call this function at any time and it will change on the next calls.
+MyPlayerData p_data[4];
+input_set_user_instance(CONTROLLER_1, &p_data[0]);
+input_set_user_instance(CONTROLLER_2, &p_data[1]);
+input_set_user_instance(CONTROLLER_3, &p_data[2]);
+input_set_user_instance(CONTROLLER_4, &p_data[3]);
+
 // registering action events (events that will be triggered once per button 'press' or 'release')
-input_add_action_event(&mem_pool, 1, EV_PAUSE, event_pause_callback, NULL, gp_pressed);
-input_add_action_event(&mem_pool, 1, EV_ATTACK, event_attack_callback, NULL, gp_released);
-input_add_action_event(&mem_pool, 1, EV_DEFEND, event_defend_callback, NULL, gp_pressed);
+input_add_action_event(&mem_pool, EV_PAUSE, event_pause_callback, gp_pressed);
+input_add_action_event(&mem_pool, EV_ATTACK, event_attack_callback, gp_released);
+input_add_action_event(&mem_pool, EV_DEFEND, event_defend_callback, gp_pressed);
 
 // registering axis events (events that will trigger every frame, with either '0' or a value from 'deadzone' to 'max_analog', multiplied by the 'scale' set later)
-input_add_axis_event(&mem_pool, 1, EV_MOVE_HOR, event_move_hor_callback, NULL);
-input_add_axis_event(&mem_pool, 1, EV_MOVE_VERT, event_move_vert_callback, NULL);
+input_add_axis_event(&mem_pool, EV_MOVE_HOR, event_move_hor_callback);
+input_add_axis_event(&mem_pool, EV_MOVE_VERT, event_move_vert_callback);
 
 // binding multiple axis to actions
-input_add_axis_binding(&mem_pool, gp_analog_horizontal, 1, EV_MOVE_HOR);
-input_add_axis_binding(&mem_pool, gp_left, -1, EV_MOVE_HOR); // here you can see how to use a button to an axis callback
-input_add_axis_binding(&mem_pool, gp_right, 1, EV_MOVE_HOR);
-input_add_axis_binding(&mem_pool, gp_analog_vertical, 1, EV_MOVE_VERT);
-input_add_axis_binding(&mem_pool, gp_up, 1, EV_MOVE_VERT);
-input_add_axis_binding(&mem_pool, gp_down, -1, EV_MOVE_VERT);
+input_add_axis_binding(&mem_pool, gp_analog_horizontal, 1, EV_MOVE_HOR, CONTROLLER_1);
+input_add_axis_binding(&mem_pool, gp_left, -1, EV_MOVE_HOR, CONTROLLER_1); // here you can see how to use a button to an axis callback
+input_add_axis_binding(&mem_pool, gp_right, 1, EV_MOVE_HOR, CONTROLLER_1);
+input_add_axis_binding(&mem_pool, gp_analog_vertical, 1, EV_MOVE_VERT, CONTROLLER_1);
+input_add_axis_binding(&mem_pool, gp_up, 1, EV_MOVE_VERT, CONTROLLER_1);
+input_add_axis_binding(&mem_pool, gp_down, -1, EV_MOVE_VERT, CONTROLLER_1);
 
 // binding multiple buttons to actions
-input_add_action_binding(&mem_pool, gp_start, EV_PAUSE);
-input_add_action_binding(&mem_pool, gp_A, EV_ATTACK);
-input_add_action_binding(&mem_pool, gp_Z, EV_ATTACK); // you can register multiple buttons to the same action
-input_add_action_binding(&mem_pool, gp_L, EV_ATTACK);
-input_add_action_binding(&mem_pool, gp_B, EV_DEFEND);
-input_add_action_binding(&mem_pool, gp_R, EV_DEFEND);
+input_add_action_binding(&mem_pool, gp_start, EV_PAUSE, CONTROLLER_1);
+input_add_action_binding(&mem_pool, gp_A, EV_ATTACK, CONTROLLER_1);
+input_add_action_binding(&mem_pool, gp_Z, EV_ATTACK, CONTROLLER_1); // you can register multiple buttons to the same action
+input_add_action_binding(&mem_pool, gp_L, EV_ATTACK, CONTROLLER_1);
+input_add_action_binding(&mem_pool, gp_B, EV_DEFEND, CONTROLLER_1);
+input_add_action_binding(&mem_pool, gp_R, EV_DEFEND, CONTROLLER_1);
 
 // you can remove all bindings using the function below.
 // don't forget to re-add all bindings (but not the events) after calling this function.
 input_remove_all_bindings();
 
 // have to be called every frame. it will update all controller information and call the events when they happen.
-input_update()
+input_update();
 
 // you can use the function below to know if a controller is connected.
 // it should update the connected controllers around every second.
@@ -702,6 +710,49 @@ input_action_event_pause(EV_ATTACK);
 input_axis_event_resume(EV_MOVE_HOR);
 input_axis_event_resume(EV_MOVE_VERT);
 input_action_event_resume(EV_ATTACK);
+```
+
+**Multiplayer Input**
+
+For multiplayer input, you should reuse the events, but create new bindings for each new player.
+
+```c
+// creating a struct to keep the player data
+typedef struct {
+	float x;
+	float y;
+} MyPlayerData;
+
+// setting function callback. this will be called independently for each player.
+void event_move_hor_callback(void *instance, int scale) {
+	MyPlayerData* data = (MyPlayerData*)instance;
+	data->x += speed * scale;
+}
+
+// set controller data for each player
+MyPlayerData p_data[4];
+input_set_user_instance(CONTROLLER_1, &p_data[0]);
+input_set_user_instance(CONTROLLER_2, &p_data[1]);
+input_set_user_instance(CONTROLLER_3, &p_data[2]);
+input_set_user_instance(CONTROLLER_4, &p_data[3]);
+
+// setting events. these are used across all players
+input_add_axis_event(&mem_pool, EV_MOVE_HOR, event_move_hor_callback);
+input_add_axis_event(&mem_pool, EV_MOVE_VERT, event_move_vert_callback);
+
+// setting bindings. these are per player.
+input_add_axis_binding(&mem_pool, gp_analog_horizontal, 1, EV_MOVE_HOR, CONTROLLER_1); // player 1
+input_add_axis_binding(&mem_pool, gp_analog_vertical, 1, EV_MOVE_VERT, CONTROLLER_1);
+input_add_axis_binding(&mem_pool, gp_analog_horizontal, 1, EV_MOVE_HOR, CONTROLLER_2); // player 2
+input_add_axis_binding(&mem_pool, gp_analog_vertical, 1, EV_MOVE_VERT, CONTROLLER_2);
+input_add_axis_binding(&mem_pool, gp_analog_horizontal, 1, EV_MOVE_HOR, CONTROLLER_3); // player 3
+input_add_axis_binding(&mem_pool, gp_analog_vertical, 1, EV_MOVE_VERT, CONTROLLER_3);
+input_add_axis_binding(&mem_pool, gp_analog_horizontal, 1, EV_MOVE_HOR, CONTROLLER_4); // player 4
+input_add_axis_binding(&mem_pool, gp_analog_vertical, 1, EV_MOVE_VERT, CONTROLLER_4);
+
+// this will trigger each event per connected controller.
+// on this example, 'event_move_hor_callback' will be called 4 times, with a different 'instance'.
+input_update();
 ```
 
 ## More Examples

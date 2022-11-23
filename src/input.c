@@ -39,6 +39,9 @@ void input_init(MemZone *global_memory_pool, uint8_t actions_max_count,
 	input->max_analog = 60.f;
 	input->actions_max_events_count = actions_max_count;
 	input->actions_max_bindings_count = actions_max_bindings_count;
+	for (InputController i = CONTROLLER_1; i < CONTROLLER_MAX; ++i) {
+		input->controller_instances[i] = NULL;
+	}
 
 	input_action_events = mem_zone_alloc(global_memory_pool,
 										 sizeof(InputActionEvent *) * actions_max_count);
@@ -48,6 +51,10 @@ void input_init(MemZone *global_memory_pool, uint8_t actions_max_count,
 	input_axis_events = MEM_ALLOC(sizeof(InputAxisEvent *) * actions_max_count, global_memory_pool);
 	input_axis_bindings = MEM_ALLOC(sizeof(InputAxisBinding *) * actions_max_bindings_count,
 									global_memory_pool);
+}
+
+void input_set_user_instance(InputController controller_id, void *instance) {
+	input->controller_instances[controller_id] = instance;
 }
 
 void input_set_deadzone(float deadzone) {
@@ -125,21 +132,23 @@ void input_update() {
 	keys_held = get_keys_held();
 	keys_up = get_keys_up();
 
-	for (uint8_t i = 0; i < input->current_action_bindings; ++i) {
-		for (InputController controller_id = CONTROLLER_1; controller_id < CONTROLLER_MAX; ++controller_id) {
-			if (!input_is_controller_connected(controller_id)) {
+	for (uint8_t event_id = 0; event_id < input->current_action_events; ++event_id) {
+		if (input_action_events[event_id]->is_paused)
+			continue;
+
+		for (InputController controller_id = CONTROLLER_1; controller_id < CONTROLLER_MAX;
+			 ++controller_id) {
+			if (!input_is_controller_connected(controller_id))
 				continue;
-			}
 
-			for (uint8_t j = 0; j < input->current_action_events; ++j) {
-				if (input_action_events[j]->is_paused)
-					continue;
-
-				if (input_action_events[j]->controller_id == controller_id &&
-					input_action_events[j]->action_id == input_action_bindings[i]->action_id &&
-					input_button_is_on_state(controller_id, input_action_bindings[i]->button,
-											 input_action_events[j]->state)) {
-					input_action_events[j]->action_callback(input_action_events[j]->instance);
+			for (uint8_t bind_id = 0; bind_id < input->current_action_bindings; ++bind_id) {
+				if (input_action_bindings[bind_id]->controller_id == controller_id &&
+					input_action_events[event_id]->action_id ==
+						input_action_bindings[bind_id]->action_id &&
+					input_button_is_on_state(controller_id, input_action_bindings[bind_id]->button,
+											 input_action_events[event_id]->state)) {
+					input_action_events[event_id]->action_callback(
+						input->controller_instances[controller_id]);
 					break;
 				}
 			}
@@ -150,86 +159,92 @@ void input_update() {
 		if (input_axis_events[event_id]->is_paused)
 			continue;
 
-		if (!input_is_controller_connected(input_axis_events[event_id]->controller_id))
-			continue;
-
-		bool action_done = false;
-
-		for (uint8_t bind_id = 0; bind_id < input->current_axis_bindings; ++bind_id) {
-			if (input_axis_bindings[bind_id]->action_id != input_axis_events[event_id]->action_id)
+		for (InputController controller_id = CONTROLLER_1; controller_id < CONTROLLER_MAX;
+			 ++controller_id) {
+			if (!input_is_controller_connected(controller_id))
 				continue;
 
-			if (input_axis_bindings[bind_id]->button == gp_analog_horizontal ||
-				input_axis_bindings[bind_id]->button == gp_analog_vertical) {
-				int force = (input_axis_bindings[bind_id]->button == gp_analog_horizontal)
-								? keys_held.c[input_axis_events[event_id]->controller_id].x
-								: keys_held.c[input_axis_events[event_id]->controller_id].y;
-				if (force > input->max_analog)
-					force = input->max_analog;
-				if (force < -input->max_analog)
-					force = -input->max_analog;
-				if (force < -input->deadzone || force > input->deadzone) {
-					input_axis_events[event_id]->axis_callback(
-						input_axis_events[event_id]->instance,
-						force * input_axis_bindings[bind_id]->scale);
-					action_done = true;
-					break;
-				}
-			} else {
-				bool held = input_button_is_on_state(input_axis_events[event_id]->controller_id,
-													 input_axis_bindings[bind_id]->button, gp_held);
-				if (held) {
-					input_axis_events[event_id]->axis_callback(
-						input_axis_events[event_id]->instance,
-						input->max_analog * input_axis_bindings[bind_id]->scale);
-					action_done = true;
-					break;
+			bool action_done = false;
+			bool has_binding = false;
+
+			for (uint8_t bind_id = 0; bind_id < input->current_axis_bindings; ++bind_id) {
+				if (controller_id != input_axis_bindings[bind_id]->controller_id)
+					continue;
+
+				if (input_axis_bindings[bind_id]->action_id !=
+					input_axis_events[event_id]->action_id)
+					continue;
+
+				has_binding = true;
+
+				if (input_axis_bindings[bind_id]->button == gp_analog_horizontal ||
+					input_axis_bindings[bind_id]->button == gp_analog_vertical) {
+					int force = (input_axis_bindings[bind_id]->button == gp_analog_horizontal)
+									? keys_held.c[controller_id].x
+									: keys_held.c[controller_id].y;
+					if (force > input->max_analog)
+						force = input->max_analog;
+					if (force < -input->max_analog)
+						force = -input->max_analog;
+					if (force < -input->deadzone || force > input->deadzone) {
+						input_axis_events[event_id]->axis_callback(
+							input->controller_instances[controller_id],
+							force * input_axis_bindings[bind_id]->scale);
+						action_done = true;
+						break;
+					}
+				} else {
+					bool held = input_button_is_on_state(
+						controller_id, input_axis_bindings[bind_id]->button, gp_held);
+					if (held) {
+						input_axis_events[event_id]->axis_callback(
+							input->controller_instances[controller_id],
+							input->max_analog * input_axis_bindings[bind_id]->scale);
+						action_done = true;
+						break;
+					}
 				}
 			}
-		}
 
-		if (!action_done) {
-			input_axis_events[event_id]->axis_callback(input_axis_events[event_id]->instance, 0);
+			if (!action_done && has_binding) {
+				input_axis_events[event_id]->axis_callback(
+					input->controller_instances[controller_id], 0);
+			}
 		}
 	}
 }
 
-void input_add_action_event(MemZone *global_memory_pool, InputController controller_id, uint8_t action_id,
-							fnIInputActionCallback action_callback, void *instance,
-							gamepad_button_state state) {
+void input_add_action_event(MemZone *global_memory_pool, uint8_t action_id,
+							fnIInputActionCallback action_callback, gamepad_button_state state) {
 	assertf(input->current_action_events < input->actions_max_events_count,
 			"Trying to add more action_events than set on 'input_init'");
 
 	uint8_t cur_action = input->current_action_events;
 	if (input_action_events[cur_action] == NULL)
 		input_action_events[cur_action] = MEM_ALLOC(sizeof(InputActionEvent), global_memory_pool);
-	input_action_events[cur_action]->controller_id = controller_id;
 	input_action_events[cur_action]->action_id = action_id;
 	input_action_events[cur_action]->action_callback = action_callback;
-	input_action_events[cur_action]->instance = instance;
 	input_action_events[cur_action]->state = state;
 
 	input->current_action_events++;
 }
 
-void input_add_axis_event(MemZone *global_memory_pool, InputController controller_id, uint8_t action_id,
-						  fnIInputAxisCallback axis_callback, void *instance) {
+void input_add_axis_event(MemZone *global_memory_pool, uint8_t action_id,
+						  fnIInputAxisCallback axis_callback) {
 	assertf(input->current_axis_events < input->actions_max_events_count,
 			"Trying to add more axis_events than set on 'input_init'");
 
 	uint8_t cur_action = input->current_axis_events;
 	if (input_axis_events[cur_action] == NULL)
 		input_axis_events[cur_action] = MEM_ALLOC(sizeof(InputAxisEvent), global_memory_pool);
-	input_axis_events[cur_action]->controller_id = controller_id;
 	input_axis_events[cur_action]->action_id = action_id;
 	input_axis_events[cur_action]->axis_callback = axis_callback;
-	input_axis_events[cur_action]->instance = instance;
 
 	input->current_axis_events++;
 }
 
-void input_add_action_binding(MemZone *global_memory_pool, gamepad_button button,
-							  uint8_t action_id) {
+void input_add_action_binding(MemZone *global_memory_pool, gamepad_button button, uint8_t action_id,
+							  InputController controller_id) {
 	assertf(input->current_action_bindings < input->actions_max_bindings_count,
 			"Trying to add more action_bindings than set on 'input_init'");
 
@@ -239,12 +254,13 @@ void input_add_action_binding(MemZone *global_memory_pool, gamepad_button button
 													  global_memory_pool);
 	input_action_bindings[cur_action]->button = button;
 	input_action_bindings[cur_action]->action_id = action_id;
+	input_action_bindings[cur_action]->controller_id = controller_id;
 
 	input->current_action_bindings++;
 }
 
 void input_add_axis_binding(MemZone *global_memory_pool, gamepad_button button, float scale,
-							uint8_t action_id) {
+							uint8_t action_id, InputController controller_id) {
 	assertf(input->current_axis_bindings < input->actions_max_bindings_count,
 			"Trying to add more axis_bindings than set on 'input_init'");
 
@@ -254,6 +270,7 @@ void input_add_axis_binding(MemZone *global_memory_pool, gamepad_button button, 
 	input_axis_bindings[cur_action]->button = button;
 	input_axis_bindings[cur_action]->scale = scale;
 	input_axis_bindings[cur_action]->action_id = action_id;
+	input_axis_bindings[cur_action]->controller_id = controller_id;
 
 	input->current_axis_bindings++;
 }

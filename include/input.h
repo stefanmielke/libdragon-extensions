@@ -24,14 +24,10 @@ typedef void (*fnIInputActionCallback)(void *instance);
 typedef void (*fnIInputAxisCallback)(void *instance, int scale);
 
 typedef struct InputActionEvent {
-	/// controller used for this action.
-	InputController controller_id;
 	/// id of the action.
 	uint8_t action_id;
 	/// callback function that will be triggered when this action happens
 	fnIInputActionCallback action_callback;
-	/// user object/state that will be passed to the callback.
-	void *instance;
 	/// type of the trigger (when the button is pressed or released)
 	gamepad_button_state state;
 	/// if this event will not generate callbacks
@@ -43,17 +39,15 @@ typedef struct InputActionBinding {
 	gamepad_button button;
 	/// id of the action that will be triggered by the button
 	uint8_t action_id;
+	/// controller used for this action.
+	InputController controller_id;
 } InputActionBinding;
 
 typedef struct InputAxisEvent {
-	/// controller used for this action.
-	InputController controller_id;
 	/// id of the action.
 	uint8_t action_id;
 	/// callback function that will be triggered every frame
 	fnIInputAxisCallback axis_callback;
-	/// user object/state that will be passed to the callback.
-	void *instance;
 	/// if this event will not generate callbacks
 	bool is_paused;
 } InputAxisEvent;
@@ -65,6 +59,8 @@ typedef struct InputAxisBinding {
 	float scale;
 	/// id of the action that will be triggered by the button
 	uint8_t action_id;
+	/// controller used for this action.
+	InputController controller_id;
 } InputAxisBinding;
 
 typedef struct Input {
@@ -86,6 +82,9 @@ typedef struct Input {
 	uint8_t current_axis_events;
 	/// current count of axis bindings
 	uint8_t current_axis_bindings;
+
+	// user instances bound to each controller. they will be sent on the callbacks.
+	void *controller_instances[CONTROLLER_MAX];
 } Input;
 
 /// Input singleton
@@ -123,6 +122,15 @@ void input_init(MemZone *global_memory_pool, uint8_t actions_max_count,
  * @brief Updates the input objects and call any callbacks that need to be triggered.
  */
 void input_update();
+
+/**
+ * @brief Set the user instance for s given controller. This instance will be sent back by the
+ * events on the callbacks.
+ *
+ * @param controller_id Id of the controller.
+ * @param instance User-defined instance.
+ */
+void input_set_user_instance(InputController controller_id, void *instance);
 
 /**
  * @brief Sets the axis deadzone. Default is 5.
@@ -178,9 +186,8 @@ bool input_is_controller_connected(InputController controller_id);
  * @param[in] state
  *            Type of state that will trigger the event (gp_released or gp_pressed).
  */
-void input_add_action_event(MemZone *global_memory_pool, InputController controller_id, uint8_t action_id,
-							fnIInputActionCallback action_callback, void *instance,
-							gamepad_button_state state);
+void input_add_action_event(MemZone *global_memory_pool, uint8_t action_id,
+							fnIInputActionCallback action_callback, gamepad_button_state state);
 
 /**
  * @brief Adds an action event bound to a callback that will be triggered every frame.
@@ -197,8 +204,8 @@ void input_add_action_event(MemZone *global_memory_pool, InputController control
  *            A user defined object/state that will be sent to the callback when the event happens.
  * Can be NULL.
  */
-void input_add_axis_event(MemZone *global_memory_pool, InputController controller_id, uint8_t action_id,
-						  fnIInputAxisCallback axis_callback, void *instance);
+void input_add_axis_event(MemZone *global_memory_pool, uint8_t action_id,
+						  fnIInputAxisCallback axis_callback);
 
 /**
  * @brief Binds a button to cause an action added by input_add_action_event.
@@ -210,8 +217,8 @@ void input_add_axis_event(MemZone *global_memory_pool, InputController controlle
  * @param action_id
  *            Id of the action. This id is user controlled. Ideally an enum should be used.
  */
-void input_add_action_binding(MemZone *global_memory_pool, gamepad_button button,
-							  uint8_t action_id);
+void input_add_action_binding(MemZone *global_memory_pool, gamepad_button button, uint8_t action_id,
+							  InputController controller_id);
 
 /**
  * @brief Binds a button to cause an action added by input_add_action_event.
@@ -227,7 +234,7 @@ void input_add_action_binding(MemZone *global_memory_pool, gamepad_button button
  *            Id of the action. This id is user controlled. Ideally an enum should be used.
  */
 void input_add_axis_binding(MemZone *global_memory_pool, gamepad_button button, float scale,
-							uint8_t action_id);
+							uint8_t action_id, InputController controller_id);
 
 /**
  * @brief Pause all axis callbacks for a given action. Call input_axis_event_resume to resume.
