@@ -5,6 +5,14 @@
 #include "input_enums.h"
 #include "mem_pool.h"
 
+typedef enum InputController {
+	CONTROLLER_1 = 0,
+	CONTROLLER_2,
+	CONTROLLER_3,
+	CONTROLLER_4,
+	CONTROLLER_MAX,
+} InputController;
+
 /**
  * @brief Called during input_update when the action is performed.
  */
@@ -16,8 +24,8 @@ typedef void (*fnIInputActionCallback)(void *instance);
 typedef void (*fnIInputAxisCallback)(void *instance, int scale);
 
 typedef struct InputActionEvent {
-	/// controller used for this action. starts from 1.
-	uint8_t controller_id;
+	/// controller used for this action.
+	InputController controller_id;
 	/// id of the action.
 	uint8_t action_id;
 	/// callback function that will be triggered when this action happens
@@ -38,8 +46,8 @@ typedef struct InputActionBinding {
 } InputActionBinding;
 
 typedef struct InputAxisEvent {
-	/// controller used for this action. starts from 1.
-	uint8_t controller_id;
+	/// controller used for this action.
+	InputController controller_id;
 	/// id of the action.
 	uint8_t action_id;
 	/// callback function that will be triggered every frame
@@ -108,7 +116,8 @@ extern struct controller_data keys_up;
  *            Max count for actions. This will determine the size of the arrays.
  * @return Input* The Input struct initialized.
  */
-void input_init(MemZone *global_memory_pool, uint8_t actions_max_count, uint8_t actions_max_bindings);
+void input_init(MemZone *global_memory_pool, uint8_t actions_max_count,
+				uint8_t actions_max_bindings);
 
 /**
  * @brief Updates the input objects and call any callbacks that need to be triggered.
@@ -142,11 +151,11 @@ void input_remove_all_bindings();
 /**
  * @brief Return if the controller with the ID is connected.
  *
- * @param[in] id Id of the controller. Starts with 1 and go up to 4.
+ * @param[in] controller_id Id of the controller.
  * @return true If the controller is connected.
  * @return false If the controller is not connected.
  */
-bool input_is_controller_connected(uint8_t id);
+bool input_is_controller_connected(InputController controller_id);
 
 // /* TODO: add param here */ void input_serialize();
 // void input_deserialize(/* TODO: add param here */);
@@ -158,7 +167,7 @@ bool input_is_controller_connected(uint8_t id);
  * @param[in] global_memory_pool
  *            The global memory pool. If NULL will use malloc.
  * @param[in] controller_id
- *            The id of the controller port used. Starts at 1.
+ *            The id of the controller port used.
  * @param[in] action_id
  *            Id of the action. This id is user controlled. Ideally an enum should be used.
  * @param[in] action_callback
@@ -169,7 +178,7 @@ bool input_is_controller_connected(uint8_t id);
  * @param[in] state
  *            Type of state that will trigger the event (gp_released or gp_pressed).
  */
-void input_add_action_event(MemZone *global_memory_pool, uint8_t controller_id, uint8_t action_id,
+void input_add_action_event(MemZone *global_memory_pool, InputController controller_id, uint8_t action_id,
 							fnIInputActionCallback action_callback, void *instance,
 							gamepad_button_state state);
 
@@ -179,7 +188,7 @@ void input_add_action_event(MemZone *global_memory_pool, uint8_t controller_id, 
  * @param global_memory_pool
  *            The global memory pool. If NULL will use malloc.
  * @param controller_id
- *            The id of the controller port used. Starts at 1.
+ *            The id of the controller port used.
  * @param action_id
  *            Id of the action. This id is user controlled. Ideally an enum should be used.
  * @param axis_callback
@@ -188,7 +197,7 @@ void input_add_action_event(MemZone *global_memory_pool, uint8_t controller_id, 
  *            A user defined object/state that will be sent to the callback when the event happens.
  * Can be NULL.
  */
-void input_add_axis_event(MemZone *global_memory_pool, uint8_t controller_id, uint8_t action_id,
+void input_add_axis_event(MemZone *global_memory_pool, InputController controller_id, uint8_t action_id,
 						  fnIInputAxisCallback axis_callback, void *instance);
 
 /**
@@ -222,28 +231,29 @@ void input_add_axis_binding(MemZone *global_memory_pool, gamepad_button button, 
 
 /**
  * @brief Pause all axis callbacks for a given action. Call input_axis_event_resume to resume.
- * 
+ *
  * @param action_id Id of the action that will be paused.
  */
 void input_axis_event_pause(uint8_t action_id);
 
 /**
  * @brief Resume all axis callbacks for a given action. Call input_axis_event_pause to pause again.
- * 
+ *
  * @param action_id Id of the action that will be resumed.
  */
 void input_axis_event_resume(uint8_t action_id);
 
 /**
  * @brief Pause all action callbacks for a given action. Call input_action_event_resume to resume.
- * 
+ *
  * @param action_id Id of the action that will be paused.
  */
 void input_action_event_pause(uint8_t action_id);
 
 /**
- * @brief Resume all action callbacks for a given action. Call input_action_event_pause to pause again.
- * 
+ * @brief Resume all action callbacks for a given action. Call input_action_event_pause to pause
+ * again.
+ *
  * @param action_id Id of the action that will be resumed.
  */
 void input_action_event_resume(uint8_t action_id);

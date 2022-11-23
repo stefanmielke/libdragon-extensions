@@ -15,15 +15,15 @@ struct controller_data keys_up;
 
 static int controllers_connected;
 
-bool input_is_controller_connected(uint8_t id) {
-	switch (id) {
-		case 1:
+bool input_is_controller_connected(InputController controller_id) {
+	switch (controller_id) {
+		case CONTROLLER_1:
 			return controllers_connected & CONTROLLER_1_INSERTED;
-		case 2:
+		case CONTROLLER_2:
 			return controllers_connected & CONTROLLER_2_INSERTED;
-		case 3:
+		case CONTROLLER_3:
 			return controllers_connected & CONTROLLER_3_INSERTED;
-		case 4:
+		case CONTROLLER_4:
 			return controllers_connected & CONTROLLER_4_INSERTED;
 		default:
 			return false;
@@ -72,7 +72,7 @@ void input_update_controllers_connected() {
 	}
 }
 
-bool input_button_is_on_state(uint8_t controller_id, gamepad_button button,
+bool input_button_is_on_state(InputController controller_id, gamepad_button button,
 							  gamepad_button_state state) {
 	struct controller_data *data;
 	if (state == gp_pressed) {
@@ -85,33 +85,33 @@ bool input_button_is_on_state(uint8_t controller_id, gamepad_button button,
 
 	switch (button) {
 		case gp_A:
-			return data->c[controller_id - 1].A;
+			return data->c[controller_id].A;
 		case gp_B:
-			return data->c[controller_id - 1].B;
+			return data->c[controller_id].B;
 		case gp_Z:
-			return data->c[controller_id - 1].Z;
+			return data->c[controller_id].Z;
 		case gp_start:
-			return data->c[controller_id - 1].start;
+			return data->c[controller_id].start;
 		case gp_up:
-			return data->c[controller_id - 1].up;
+			return data->c[controller_id].up;
 		case gp_down:
-			return data->c[controller_id - 1].down;
+			return data->c[controller_id].down;
 		case gp_left:
-			return data->c[controller_id - 1].left;
+			return data->c[controller_id].left;
 		case gp_right:
-			return data->c[controller_id - 1].right;
+			return data->c[controller_id].right;
 		case gp_L:
-			return data->c[controller_id - 1].L;
+			return data->c[controller_id].L;
 		case gp_R:
-			return data->c[controller_id - 1].R;
+			return data->c[controller_id].R;
 		case gp_C_up:
-			return data->c[controller_id - 1].C_up;
+			return data->c[controller_id].C_up;
 		case gp_C_down:
-			return data->c[controller_id - 1].C_down;
+			return data->c[controller_id].C_down;
 		case gp_C_left:
-			return data->c[controller_id - 1].C_left;
+			return data->c[controller_id].C_left;
 		case gp_C_right:
-			return data->c[controller_id - 1].C_right;
+			return data->c[controller_id].C_right;
 		default:
 			return false;
 	}
@@ -126,7 +126,7 @@ void input_update() {
 	keys_up = get_keys_up();
 
 	for (uint8_t i = 0; i < input->current_action_bindings; ++i) {
-		for (uint8_t controller_id = 1; controller_id <= 4; ++controller_id) {
+		for (InputController controller_id = CONTROLLER_1; controller_id < CONTROLLER_MAX; ++controller_id) {
 			if (!input_is_controller_connected(controller_id)) {
 				continue;
 			}
@@ -162,8 +162,8 @@ void input_update() {
 			if (input_axis_bindings[bind_id]->button == gp_analog_horizontal ||
 				input_axis_bindings[bind_id]->button == gp_analog_vertical) {
 				int force = (input_axis_bindings[bind_id]->button == gp_analog_horizontal)
-								? keys_held.c[input_axis_events[event_id]->controller_id - 1].x
-								: keys_held.c[input_axis_events[event_id]->controller_id - 1].y;
+								? keys_held.c[input_axis_events[event_id]->controller_id].x
+								: keys_held.c[input_axis_events[event_id]->controller_id].y;
 				if (force > input->max_analog)
 					force = input->max_analog;
 				if (force < -input->max_analog)
@@ -194,7 +194,7 @@ void input_update() {
 	}
 }
 
-void input_add_action_event(MemZone *global_memory_pool, uint8_t controller_id, uint8_t action_id,
+void input_add_action_event(MemZone *global_memory_pool, InputController controller_id, uint8_t action_id,
 							fnIInputActionCallback action_callback, void *instance,
 							gamepad_button_state state) {
 	assertf(input->current_action_events < input->actions_max_events_count,
@@ -212,7 +212,7 @@ void input_add_action_event(MemZone *global_memory_pool, uint8_t controller_id, 
 	input->current_action_events++;
 }
 
-void input_add_axis_event(MemZone *global_memory_pool, uint8_t controller_id, uint8_t action_id,
+void input_add_axis_event(MemZone *global_memory_pool, InputController controller_id, uint8_t action_id,
 						  fnIInputAxisCallback axis_callback, void *instance) {
 	assertf(input->current_axis_events < input->actions_max_events_count,
 			"Trying to add more axis_events than set on 'input_init'");
