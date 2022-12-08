@@ -54,7 +54,7 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
  * @param screen_rect
  *        Rect of the current screen. Used to cull tiles outside of the screen.
  */
-void tiled_render(display_context_t disp, Tiled *tiled, Rect screen_rect);
+void tiled_render(surface_t *disp, Tiled *tiled, Rect screen_rect);
 
 /**
  * @brief Render a Tiled map using hardware rendering. Use this when there's not much texture

@@ -276,7 +276,7 @@ This allows you to create different files that can represent your scenes and jus
 // callbacks for a scene
 void main_screen_create();
 short main_screen_tick();
-void main_screen_display(display_context_t disp);
+void main_screen_display(surface_t *disp);
 void main_screen_destroy()
 
 // callback for changing scenes

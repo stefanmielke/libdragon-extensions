@@ -58,7 +58,7 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 	return tiled_map;
 }
 
-void tiled_render(display_context_t disp, Tiled *tiled, Rect screen_rect) {
+void tiled_render(surface_t *disp, Tiled *tiled, Rect screen_rect) {
 	SET_VARS()
 
 	BEGIN_LOOP()

@@ -54,7 +54,7 @@ void scene_manager_tick(SceneManager *scene_manager) {
 	scene_manager->next_scene_id = scene_manager->scene_callbacks.tick();
 }
 
-void scene_manager_display(SceneManager *scene_manager, display_context_t disp) {
+void scene_manager_display(SceneManager *scene_manager, surface_t *disp) {
 	scene_manager->scene_callbacks.display(disp);
 }
 

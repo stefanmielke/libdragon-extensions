@@ -259,7 +259,7 @@ void menu_add_item_colored(Menu *menu, char *text, bool enabled, uint32_t color_
  * @param disp
  *        The display context used in the game.
  */
-void menu_render(Menu *menu, display_context_t disp);
+void menu_render(Menu *menu, surface_t *disp);
 
 /**
  * @brief Allocates and initializes submenus for the menu.
@@ -279,11 +279,11 @@ void menu_init_submenus(Menu *menu, MemZone *memory_pool, uint8_t total_submenus
 /**
  * @brief Method that will render the borders of the menu.
  */
-void menu_draw_background_borders(display_context_t disp, int top, int left, int bottom, int right);
+void menu_draw_background_borders(surface_t *disp, int top, int left, int bottom, int right);
 /**
  * @brief Method that will render the center of the menu.
  */
-void menu_draw_background_center(display_context_t disp, int top, int left, int bottom, int right);
+void menu_draw_background_center(surface_t *disp, int top, int left, int bottom, int right);
 
 /**
  * @brief Initializes the menu default colors

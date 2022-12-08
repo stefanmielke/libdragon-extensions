@@ -224,7 +224,7 @@ int menu_tick(Menu *menu, struct controller_data *keys_down) {
 	return -1;
 }
 
-void menu_render(Menu *menu, display_context_t disp) {
+void menu_render(Menu *menu, surface_t *disp) {
 	if (menu->active_submenu >= 0 && menu->submenus) {
 		Menu *active_submenu = menu->submenus[menu->active_submenu];
 
@@ -317,7 +317,7 @@ void menu_init_submenus(Menu *menu, MemZone *memory_pool, uint8_t total_submenus
 	menu->display_when_on_submenu = display_when_on_submenu;
 }
 
-void menu_draw_background_borders(display_context_t disp, int top, int left, int bottom,
+void menu_draw_background_borders(surface_t *disp, int top, int left, int bottom,
 								  int right) {
 	graphics_draw_sprite_trans_stride(disp, left, top, menu_background_sprite,
 									  SPRITE_menu_top_left);
@@ -347,7 +347,7 @@ void menu_draw_background_borders(display_context_t disp, int top, int left, int
 	}
 }
 
-void menu_draw_background_center(display_context_t disp, int top, int left, int bottom, int right) {
+void menu_draw_background_center(surface_t *disp, int top, int left, int bottom, int right) {
 	// TODO: remove this "hack" and properly render the texture. Cause: libdragon issue with 32 bits
 	left += 8;
 	top += 8;
