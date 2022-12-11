@@ -33,10 +33,59 @@ void animated_sprite_tick(AnimatedSprite *anim, float anim_rate) {
 }
 
 void animated_sprite_draw(AnimatedSprite *anim, Position pos, Rect screen_rect) {
+	
+	tex_format_t format = sprite_get_format(anim->sprite);
+
+	// switch modes based on the appropriate texture format and
+	// limitations. For example, 4 bit formats (excluding CI4) don't support copy mode
+
+	switch(format){
+		case FMT_I4:
+		case FMT_I8:
+			rdpq_set_mode_standard();
+			break;
+		case FMT_IA4:
+			rdpq_set_mode_standard();
+			rdpq_mode_alphacompare(ALPHACOMPARE_THRESHOLD);
+			rdpq_set_blend_color(RGBA16(0,0,0,1));
+			break;
+		case FMT_CI4:
+			rdpq_set_mode_copy(true);
+			rdpq_mode_tlut(TLUT_RGBA16);
+			rdpq_tex_load_tlut(sprite_get_palette(anim->sprite), 0, 16);
+			break;
+		case FMT_CI8:
+			rdpq_set_mode_copy(true);
+			rdpq_mode_tlut(TLUT_RGBA16);
+			rdpq_tex_load_tlut(sprite_get_palette(anim->sprite), 0, 256);
+			break;
+		case FMT_IA8:
+		case FMT_IA16:
+		case FMT_RGBA16:
+		case FMT_RGBA32:
+			rdpq_set_mode_copy(true);
+			break;
+		default:
+			return;
+	}
+
 	if (is_intersecting(new_rect(pos, anim->size), screen_rect)) {
-		rdp_sync(SYNC_PIPE);
-		rdp_load_texture_stride(0, 0, MIRROR_DISABLED, anim->sprite, anim->_current_offset);
-		rdp_draw_sprite(0, pos.x - anim->render_offset.x, pos.y - anim->render_offset.y,
-						MIRROR_DISABLED);
+
+		surface_t spritesheet_surface = sprite_get_pixels(anim->sprite);
+
+		int tex_width = anim->sprite->width / anim->sprite->hslices;
+		int tex_height = anim->sprite->height / anim->sprite->hslices;
+
+		int s_0 = ((int)anim->_current_offset % anim->sprite->hslices) * tex_width;
+		int t_0 = ((int)anim->_current_offset / anim->sprite->hslices) * tex_height;
+		int s_1 = s_0 + tex_width - 1;
+		int t_1 = t_0 + tex_height - 1;
+
+		rdpq_tex_load_sub(TILE0, &spritesheet_surface, 0, s_0, t_0, s_1, t_1);
+
+		rdpq_texture_rectangle(TILE0, pos.x - anim->render_offset.x, pos.y - anim->render_offset.y,
+			pos.x - anim->render_offset.x + tex_width, pos.y - anim->render_offset.y + tex_height,
+			s_0, t_0, 1.f, 1.f);
+
 	}
 }

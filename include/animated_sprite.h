@@ -68,7 +68,8 @@ AnimatedSprite *animated_sprite_init(MemZone *memory_pool, sprite_t *sprite, Siz
 void animated_sprite_tick(AnimatedSprite *anim, float anim_rate);
 
 /**
- * @brief Draw this AnimatedSprite. Uses hardware rendering.
+ * @brief Draw this AnimatedSprite as a textured rectangle. 
+ * 		  Uses hardware rendering and supports multiple formats.
  *
  * @param anim
  *        AnimatedSprite to draw.
