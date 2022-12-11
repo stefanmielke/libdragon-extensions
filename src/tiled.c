@@ -130,7 +130,7 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
 		last_tile = tiled->map[tile];
 
 		tex_width = tiled->sprite->width / tiled->sprite->hslices;
-		tex_height = tiled->sprite->height / tiled->sprite->hslices;
+		tex_height = tiled->sprite->height / tiled->sprite->vslices;
 
 		s_0 = (tiled->map[tile] % tiled->sprite->hslices) * tex_width;
 		t_0 = (tiled->map[tile] / tiled->sprite->hslices) * tex_height;
