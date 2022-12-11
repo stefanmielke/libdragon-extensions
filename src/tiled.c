@@ -48,6 +48,7 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 		   i < map_size.width * map_size.height) {
 		for (tok = strtok(buffer, ","); tok && *tok; tok = strtok(NULL, ",\n\r")) {
 			tiled_map->map[i] = (char)atoi(tok);
+			--tiled_map->map[i]; // subtract one from the index since Tiled starts at index 1 instead of zero
 			++i;
 		}
 	}
@@ -70,22 +71,78 @@ void tiled_render(surface_t *disp, Tiled *tiled, Rect screen_rect) {
 }
 
 void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
-	rdp_sync(SYNC_PIPE);
+
+	tex_format_t format = sprite_get_format(tiled->sprite);
+
+	// switch modes based on the appropriate texture format and
+	// limitations. For example, 4 bit formats (excluding CI4) don't support copy mode
+
+	switch(format){
+		case FMT_I4:
+		case FMT_I8:
+			rdpq_set_mode_standard();
+			break;
+		case FMT_IA4:
+			rdpq_set_mode_standard();
+			rdpq_mode_alphacompare(ALPHACOMPARE_THRESHOLD);
+			rdpq_set_blend_color(RGBA16(0,0,0,1));
+			break;
+		case FMT_CI4:
+			rdpq_set_mode_copy(true);
+			rdpq_mode_tlut(TLUT_RGBA16);
+			rdpq_tex_load_tlut(sprite_get_palette(tiled->sprite), 0, 16);
+			break;
+		case FMT_CI8:
+			rdpq_set_mode_copy(true);
+			rdpq_mode_tlut(TLUT_RGBA16);
+			rdpq_tex_load_tlut(sprite_get_palette(tiled->sprite), 0, 256);
+			break;
+		case FMT_IA8:
+		case FMT_IA16:
+		case FMT_RGBA16:
+		case FMT_RGBA32:
+			rdpq_set_mode_copy(true);
+			break;
+		default:
+			return;
+	}
+
 	SET_VARS()
 
 	int last_tile = -1;
 
+	int tex_width;	// width of the parent tileset
+	int tex_height;	// height of the parent tileset
+
+	int s_0;	// initial s coordinate of tile
+	int t_0;	// initial t coordinate of tile
+	int s_1;	// final s coordinate of tile
+	int t_1;	// final t coordinate of tile
+
+	// initialize tile_surface to point to the pixels of the sprite's tileset
+	surface_t tile_surface = sprite_get_pixels(tiled->sprite);
+
 	BEGIN_LOOP()
 
+	// if the tile has changed between this and last index, load it into TMEM
 	if (last_tile != tiled->map[tile]) {
+
 		last_tile = tiled->map[tile];
-		rdp_load_texture_stride(0, 0, MIRROR_DISABLED, tiled->sprite, tiled->map[tile]);
+
+		tex_width = tiled->sprite->width / tiled->sprite->hslices;
+		tex_height = tiled->sprite->height / tiled->sprite->hslices;
+
+		s_0 = (tiled->map[tile] % tiled->sprite->hslices) * tex_width;
+		t_0 = (tiled->map[tile] / tiled->sprite->hslices) * tex_height;
+		s_1 = s_0 + tex_width - 1;
+		t_1 = t_0 + tex_height - 1;
+		
+		rdpq_tex_load_sub(TILE0, &tile_surface, 0, s_0, t_0, s_0, t_1);
 	}
 
-	rdp_draw_textured_rectangle(0, x * tiled->tile_size.width, y * tiled->tile_size.height,
+	rdpq_texture_rectangle(TILE0, x * tiled->tile_size.width, y * tiled->tile_size.height,
 								x * tiled->tile_size.width + tiled->tile_size.width,
-								y * tiled->tile_size.height + tiled->tile_size.height,
-								MIRROR_DISABLED);
+								y * tiled->tile_size.height + tiled->tile_size.height, s_0, t_0, 1.f, 1.f);
 
 	END_LOOP()
 }
