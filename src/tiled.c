@@ -145,6 +145,9 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
 								y * tiled->tile_size.height + tiled->tile_size.height, s_0, t_0, 1.f, 1.f);
 
 	END_LOOP()
+
+	rdpq_mode_tlut(TLUT_NONE);
+	rdpq_mode_alphacompare(ALPHACOMPARE_NONE);
 }
 
 void tiled_destroy(Tiled *tiled) {
