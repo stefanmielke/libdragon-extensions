@@ -1,3 +1,4 @@
+#include "../include/format_handling.h"
 #include "../include/animated_sprite.h"
 
 #include <math.h>
@@ -34,40 +35,7 @@ void animated_sprite_tick(AnimatedSprite *anim, float anim_rate) {
 
 void animated_sprite_draw(AnimatedSprite *anim, Position pos, Rect screen_rect) {
 	
-	tex_format_t format = sprite_get_format(anim->sprite);
-
-	// switch modes based on the appropriate texture format and
-	// limitations. For example, 4 bit formats (excluding CI4) don't support copy mode
-
-	switch(format){
-		case FMT_I4:
-		case FMT_I8:
-			rdpq_set_mode_standard();
-			break;
-		case FMT_IA4:
-			rdpq_set_mode_standard();
-			rdpq_mode_alphacompare(ALPHACOMPARE_THRESHOLD);
-			rdpq_set_blend_color(RGBA16(0,0,0,1));
-			break;
-		case FMT_CI4:
-			rdpq_set_mode_copy(true);
-			rdpq_mode_tlut(TLUT_RGBA16);
-			rdpq_tex_load_tlut(sprite_get_palette(anim->sprite), 0, 16);
-			break;
-		case FMT_CI8:
-			rdpq_set_mode_copy(true);
-			rdpq_mode_tlut(TLUT_RGBA16);
-			rdpq_tex_load_tlut(sprite_get_palette(anim->sprite), 0, 256);
-			break;
-		case FMT_IA8:
-		case FMT_IA16:
-		case FMT_RGBA16:
-		case FMT_RGBA32:
-			rdpq_set_mode_copy(true);
-			break;
-		default:
-			return;
-	}
+	format_set_render_mode(anim->sprite);
 
 	if (is_intersecting(new_rect(pos, anim->size), screen_rect)) {
 
