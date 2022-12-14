@@ -9,10 +9,13 @@ extern "C"{
 
 /**
  * @brief Configure the render mode based on the sprite format.
- * 		  Uses copy mode whenever possible.
+ * 		  Uses copy mode whenever possible for speed.
  *
  * @param sprite
  *        The sprite to use.
+ * @param mirroring
+ * 		  Whether or not to utilize mirroring (enabling certain types of mirroring requires mode change).
+ *        Set as false if not being used for performance.
  * @return 
  *        The format of the sprite
  */
