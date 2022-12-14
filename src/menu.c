@@ -317,8 +317,7 @@ void menu_init_submenus(Menu *menu, MemZone *memory_pool, uint8_t total_submenus
 	menu->display_when_on_submenu = display_when_on_submenu;
 }
 
-void menu_draw_background_borders(surface_t *disp, int top, int left, int bottom,
-								  int right) {
+void menu_draw_background_borders(surface_t *disp, int top, int left, int bottom, int right) {
 	graphics_draw_sprite_trans_stride(disp, left, top, menu_background_sprite,
 									  SPRITE_menu_top_left);
 

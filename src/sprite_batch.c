@@ -15,12 +15,11 @@ SpriteBatch *sprite_batch_init(MemZone *memory_pool, sprite_t *sprite, size_t qt
 }
 
 void sprite_batch_draw(SpriteBatch *sprite_batch, int offset, Rect screen_rect) {
-	
 	format_set_render_mode(sprite_batch->sprite, false);
 
 	int tex_width = sprite_batch->sprite->width / sprite_batch->sprite->hslices;
 	int tex_height = sprite_batch->sprite->height / sprite_batch->sprite->vslices;
-	
+
 	int s_0 = (offset % sprite_batch->sprite->hslices) * tex_width;
 	int t_0 = (offset / sprite_batch->sprite->hslices) * tex_height;
 	int s_1 = s_0 + tex_width - 1;
@@ -35,11 +34,11 @@ void sprite_batch_draw(SpriteBatch *sprite_batch, int offset, Rect screen_rect) 
 	for (size_t i = 0; i < sprite_batch->qty; ++i) {
 		rect.pos = sprite_batch->positions[i];
 		if (is_intersecting(rect, screen_rect)) {
-
 			int x_0 = rect.pos.x - sprite_batch->render_offset.x;
 			int y_0 = rect.pos.y - sprite_batch->render_offset.y;
 
-			rdpq_texture_rectangle(TILE0, x_0, y_0, x_0 + tex_width, y_0 + tex_width, s_0, t_0, 1, 1);
+			rdpq_texture_rectangle(TILE0, x_0, y_0, x_0 + tex_width, y_0 + tex_width, s_0, t_0, 1,
+								   1);
 		}
 	}
 }

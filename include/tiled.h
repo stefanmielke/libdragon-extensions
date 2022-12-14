@@ -58,7 +58,8 @@ void tiled_render(surface_t *disp, Tiled *tiled, Rect screen_rect);
 
 /**
  * @brief Render a Tiled map using hardware rendering. Use this when there's not much texture
- * swapping. Supports multiple texture formats and will try to render in copy mode whenever possible.
+ * swapping. Supports multiple texture formats and will try to render in copy mode whenever
+ * possible.
  *
  * @param tiled
  *        Tiled to render.

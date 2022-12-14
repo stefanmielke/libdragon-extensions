@@ -49,7 +49,8 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 		   i < map_size.width * map_size.height) {
 		for (tok = strtok(buffer, ","); tok && *tok; tok = strtok(NULL, ",\n\r")) {
 			tiled_map->map[i] = (char)atoi(tok);
-			--tiled_map->map[i]; // subtract one from the index since Tiled starts at index 1 instead of zero
+			--tiled_map->map[i];  // subtract one from the index since Tiled starts at index 1
+								  // instead of zero
 			++i;
 		}
 	}
@@ -72,20 +73,19 @@ void tiled_render(surface_t *disp, Tiled *tiled, Rect screen_rect) {
 }
 
 void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
-
 	format_set_render_mode(tiled->sprite, false);
-	
+
 	SET_VARS()
 
 	int last_tile = -1;
 
-	int tex_width;	// width of the parent tileset
-	int tex_height;	// height of the parent tileset
+	int tex_width;	 // width of the parent tileset
+	int tex_height;	 // height of the parent tileset
 
-	int s_0;	// initial s coordinate of tile
-	int t_0;	// initial t coordinate of tile
-	int s_1;	// final s coordinate of tile
-	int t_1;	// final t coordinate of tile
+	int s_0;  // initial s coordinate of tile
+	int t_0;  // initial t coordinate of tile
+	int s_1;  // final s coordinate of tile
+	int t_1;  // final t coordinate of tile
 
 	// initialize tile_surface to point to the pixels of the sprite's tileset
 	surface_t tile_surface = sprite_get_pixels(tiled->sprite);
@@ -94,7 +94,6 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
 
 	// if the tile has changed between this and last index, load it into TMEM
 	if (last_tile != tiled->map[tile]) {
-
 		last_tile = tiled->map[tile];
 
 		tex_width = tiled->sprite->width / tiled->sprite->hslices;
@@ -104,13 +103,14 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
 		t_0 = (tiled->map[tile] / tiled->sprite->hslices) * tex_height;
 		s_1 = s_0 + tex_width - 1;
 		t_1 = t_0 + tex_height - 1;
-		
+
 		rdpq_tex_load_sub(TILE0, &tile_surface, 0, s_0, t_0, s_0, t_1);
 	}
 
 	rdpq_texture_rectangle(TILE0, x * tiled->tile_size.width, y * tiled->tile_size.height,
-								x * tiled->tile_size.width + tiled->tile_size.width,
-								y * tiled->tile_size.height + tiled->tile_size.height, s_0, t_0, 1.f, 1.f);
+						   x * tiled->tile_size.width + tiled->tile_size.width,
+						   y * tiled->tile_size.height + tiled->tile_size.height, s_0, t_0, 1.f,
+						   1.f);
 
 	END_LOOP()
 
