@@ -35,14 +35,14 @@ void animated_sprite_tick(AnimatedSprite *anim, float anim_rate) {
 
 void animated_sprite_draw(AnimatedSprite *anim, Position pos, Rect screen_rect) {
 	
-	format_set_render_mode(anim->sprite);
+	format_set_render_mode(anim->sprite, false);
 
 	if (is_intersecting(new_rect(pos, anim->size), screen_rect)) {
 
 		surface_t spritesheet_surface = sprite_get_pixels(anim->sprite);
 
 		int tex_width = anim->sprite->width / anim->sprite->hslices;
-		int tex_height = anim->sprite->height / anim->sprite->hslices;
+		int tex_height = anim->sprite->height / anim->sprite->vslices;
 
 		int s_0 = ((int)anim->_current_offset % anim->sprite->hslices) * tex_width;
 		int t_0 = ((int)anim->_current_offset / anim->sprite->hslices) * tex_height;
