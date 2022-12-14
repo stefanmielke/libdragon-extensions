@@ -73,7 +73,7 @@ void tiled_render(surface_t *disp, Tiled *tiled, Rect screen_rect) {
 
 void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
 
-	format_set_render_mode(tiled->sprite);
+	format_set_render_mode(tiled->sprite, false);
 	
 	SET_VARS()
 
