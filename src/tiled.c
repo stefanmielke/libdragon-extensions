@@ -104,7 +104,7 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
 		s_1 = s_0 + tex_width - 1;
 		t_1 = t_0 + tex_height - 1;
 
-		rdpq_tex_load_sub(TILE0, &tile_surface, 0, s_0, t_0, s_0, t_1);
+		rdpq_tex_load_sub(TILE0, &tile_surface, 0, s_0, t_0, s_1, t_1);
 	}
 
 	rdpq_texture_rectangle(TILE0, x * tiled->tile_size.width, y * tiled->tile_size.height,
