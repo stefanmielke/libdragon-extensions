@@ -73,19 +73,17 @@ void tiled_render(surface_t *disp, Tiled *tiled, Rect screen_rect) {
 }
 
 void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
-	format_set_render_mode(tiled->sprite, false);
+	format_set_render_mode(tiled->sprite, false);  // Configure the RDP render modes
 
 	SET_VARS()
 
 	int last_tile = -1;
 
-	int tex_width;	 // width of the parent tileset
-	int tex_height;	 // height of the parent tileset
-
-	int s_0;  // initial s coordinate of tile
-	int t_0;  // initial t coordinate of tile
-	int s_1;  // final s coordinate of tile
-	int t_1;  // final t coordinate of tile
+	// The size of each tile
+	SizeInt tex_size = new_sizeint(tiled->sprite->width / tiled->sprite->hslices,
+								   tiled->sprite->height / tiled->sprite->vslices);
+	PositionInt tex_coord_left;	  // The top left texture coordinate of the tile
+	PositionInt tex_coord_right;  // The bottom right texture coordinate of the tile
 
 	// initialize tile_surface to point to the pixels of the sprite's tileset
 	surface_t tile_surface = sprite_get_pixels(tiled->sprite);
@@ -96,21 +94,19 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect) {
 	if (last_tile != tiled->map[tile]) {
 		last_tile = tiled->map[tile];
 
-		tex_width = tiled->sprite->width / tiled->sprite->hslices;
-		tex_height = tiled->sprite->height / tiled->sprite->vslices;
-
-		s_0 = (tiled->map[tile] % tiled->sprite->hslices) * tex_width;
-		t_0 = (tiled->map[tile] / tiled->sprite->hslices) * tex_height;
-		s_1 = s_0 + tex_width - 1;
-		t_1 = t_0 + tex_height - 1;
-
-		rdpq_tex_load_sub(TILE0, &tile_surface, 0, s_0, t_0, s_1, t_1);
+		// configure the loaded region for this tile
+		tex_coord_left.x = (tiled->map[tile] % tiled->sprite->hslices) * tex_size.width;
+		tex_coord_left.y = (tiled->map[tile] / tiled->sprite->hslices) * tex_size.height;
+		tex_coord_right.x = tex_coord_left.x + tex_size.width - 1;
+		tex_coord_right.y = tex_coord_left.y + tex_size.height - 1;
+		// load the tile region into TMEM
+		rdpq_tex_load_sub(TILE0, &tile_surface, 0, tex_coord_left.x, tex_coord_left.y,
+						  tex_coord_right.x, tex_coord_right.y);
 	}
 
-	rdpq_texture_rectangle(TILE0, x * tiled->tile_size.width, y * tiled->tile_size.height,
-						   x * tiled->tile_size.width + tiled->tile_size.width,
-						   y * tiled->tile_size.height + tiled->tile_size.height, s_0, t_0, 1.f,
-						   1.f);
+	rdpq_texture_rectangle(
+		TILE0, x * tex_size.width, y * tex_size.height, x * tex_size.width + tex_size.width,
+		y * tex_size.height + tex_size.height, tex_coord_left.x, tex_coord_left.y, 1, 1);
 
 	END_LOOP()
 
