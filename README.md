@@ -1,11 +1,11 @@
 # Libdragon Extensions
-List of structs and functions to help on Libdragon development.
+List of structs and functions to help with Libdragon development.
 
 ## Installation
 
 You can either [download the code from GitHub](https://github.com/stefanmielke/libdragon-extensions/archive/refs/heads/main.zip) into your project, or [clone the repo](https://github.com/stefanmielke/libdragon-extensions.git) inside your project as a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) (so you can use `git pull` to get the latest changes when needed).
 
-## Extensions Available
+## List of Extensions Available 
 
 - [Position](#Position)
 - [PositionInt](#PositionInt)
@@ -139,7 +139,7 @@ color_t color = new_color(r, g, b, a);
 ### Sprite Batch
 > sprite_batch.h | sprite_batch.c
 
-Used to quickly draw the same sprite on multiple positions at the same time.
+Used to quickly draw the same sprite many times at many positions. This is more performant than drawing each seperately due to minimizing the number of texture cache loads.
 
 ```c
 // initialize
@@ -202,7 +202,7 @@ mem_zone_init(&memory_pool, 1 * 1024);
 int value = mem_zone_alloc(&memory_pool, sizeof(int));
 value = 1;
 
-// resets pool to the beggining
+// resets pool to the beginning
 mem_zone_free_all(&memory_pool);
 
 // gets another int, but on the same memory space as before
@@ -212,9 +212,10 @@ int value2 = mem_zone_alloc(&memory_pool, sizeof(int));
 
 ### Tiled Support
 
-Tiled support is still not as performant due to the way the N64 works and how Libdragon works, but can work for fewer tiles and textures.
 
-It has support for Tiled CSV files, and you can use those directly, just make sure you import it using `mkdfs`.
+Tiled support is still not as performant due to the way the N64 and Libdragon work, but can work for fewer tiles and textures.
+
+It has support for Tiled CSV files, and you can use those directly, just make sure to import it using `mkdfs`.
 
 It comes in two variants.
 
@@ -224,9 +225,8 @@ This variant is the simple one, rendering left to right / top to bottom, can use
 
 The software renderer is recommended for maps with lots of texture swaps during rendering, as it provides constant time to render.
 
-The hardware rendering is preffered when there's not much texture swapping and can render maps faster than the software renderer if that's the case.
+The hardware rendering is preferred when there's not much texture swapping and can render maps faster than the software renderer if that's the case.
 
-The maximum map size I was able to load was 50x50, so take that into consideration as well.
 
 ```c
 // load the map
@@ -248,9 +248,9 @@ tiled_destroy(tile_test);
 
 > tiled_cached.h | tiled_cached.c
 
-This variant can perform really well even if you have more than a few different textures, due to its caching, that tries to prevent texture swaps as much as it can.
+This variant can perform really well even if you have more than a few different textures due to its caching, and it tries to prevent texture swaps as much as it can.
 
-It will consume more memory, and will take more time to init, and also doesn't have culling implemented.
+It consumes more memory, takes more time to init, and lacks culling.
 
 ```c
 // load the map
@@ -333,7 +333,7 @@ scene_manager_destroy(scene_manager);
 
 Object Pooling is used to create and dispose of objects rapidly and without causing memory fragmentation.
 
-It uses a macro to ensure that you can use your struct without having to cast from and to void*, but that can lead to more code being generated, so use it with care.
+It uses a macro to ensure that you can use your struct without having to cast from and to void*, but can lead to more code being generated, so use it with care.
 
 The implementation provided is of a [Free List](https://gameprogrammingpatterns.com/object-pool.html#a-free-list) and based off of [djolman's implementation](https://github.com/djoldman/fmpool) with a few modifications.
 
@@ -617,7 +617,7 @@ tween_destroy(tween);
 
 >format_handling.h
 
-Using different texture formats and render features like mirroring usually requires configuring the RDP mode manually to make the best of performance. This provides an easy way for the user to automatically configure the RDP based on the input texture format.
+Using different texture formats and render features like mirroring usually requires configuring the RDP mode manually to make the best of performance. This function provides an easy way for the user to automatically configure the RDP based on the input texture format.
 
 ```c
 // Configure based on the format of sprite with mirroring disabled
@@ -632,6 +632,6 @@ I'm trying to test and use this code on [my game](https://github.com/stefanmielk
 
 ## Development
 
-Make sure to use the included clang-format before pushing your code.
+Make sure to use the included clang-format before pushing your code! You can configure many editors to apply .clang-format upon saving.
 
 **Pull Requests are welcome!**
