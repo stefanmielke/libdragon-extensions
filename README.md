@@ -23,7 +23,7 @@ You can either [download the code from GitHub](https://github.com/stefanmielke/l
 - [Clock/Timer](#ClockTimer)
 - [Menu](#Menu)
 - [Tweening](#Tweening)
-- [Render Mode Configuration](#Format-Handling)
+- [Render Mode Configuration](#Render-Mode-Configuration)
 
 ### Position
 > position.h
