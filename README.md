@@ -23,6 +23,7 @@ You can either [download the code from GitHub](https://github.com/stefanmielke/l
 - [Clock/Timer](#ClockTimer)
 - [Menu](#Menu)
 - [Tweening](#Tweening)
+- [Render Mode Configuration](#Format-Handling)
 
 ### Position
 > position.h
@@ -611,6 +612,18 @@ tween_tick(tween);
 
 // destroying the tween (unnecessary but safe when using a memory pool)
 tween_destroy(tween);
+```
+### Render Mode Configuration
+
+>format_handling.h
+
+Using different texture formats and render features like mirroring usually requires configuring the RDP mode manually to make the best of performance. This provides an easy way for the user to automatically configure the RDP based on the input texture format.
+
+```c
+// Configure based on the format of sprite with mirroring disabled
+format_set_render_mode(sprite, false);
+
+// Render code goes here:
 ```
 
 ## More Examples
