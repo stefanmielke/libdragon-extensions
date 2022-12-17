@@ -13,7 +13,7 @@ extern "C" {
  */
 typedef struct {
 	/// Map data.
-	char *map;
+	int16_t *map;
 	/// Size of the map in tiles.
 	Size map_size;
 	/// Size of each tile.

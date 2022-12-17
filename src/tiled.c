@@ -35,8 +35,9 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 	tiled_map->sprite = sprite;
 
 	// allocate map
-	tiled_map->map = mem_zone_alloc(memory_pool, map_size.width * map_size.height);
-	memset(tiled_map->map, -1, map_size.width * map_size.height);
+	tiled_map->map = mem_zone_alloc(memory_pool,
+									sizeof(int16_t) * map_size.width * map_size.height);
+	memset(tiled_map->map, -1, sizeof(int16_t) * map_size.width * map_size.height);
 
 	// read file from dfs
 	const char *tok;
@@ -48,7 +49,7 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 	while ((bytes_read = dfs_read(buffer, sizeof(char), dfs_size(fp), fp)) > 0 &&
 		   i < map_size.width * map_size.height) {
 		for (tok = strtok(buffer, ","); tok && *tok; tok = strtok(NULL, ",\n\r")) {
-			tiled_map->map[i] = (char)atoi(tok);
+			tiled_map->map[i] = (int16_t)atoi(tok);
 			--tiled_map->map[i];  // subtract one from the index since Tiled starts at index 1
 								  // instead of zero
 			++i;
