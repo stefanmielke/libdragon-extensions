@@ -24,7 +24,7 @@
 		dfs_close(fp);                                                                             \
 	}
 
-void csv_reader_from_ints(const char *csv_path, size_t total_item_count, int output_array[]) {
+void csv_reader_from_ints(const char *csv_path, size_t total_item_count, int16_t output_array[]) {
 	CSV_READER_INTERNAL_NUMBERS(int)
 }
 
