@@ -101,8 +101,10 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect, Position view_position) {
 	// The size of each tile
 	SizeInt tex_size = new_sizeint(tiled->sprite->width / tiled->sprite->hslices,
 								   tiled->sprite->height / tiled->sprite->vslices);
-	PositionInt tex_coord_left;	  // The top left texture coordinate of the tile
-	PositionInt tex_coord_right;  // The bottom right texture coordinate of the tile
+	PositionInt tex_coord_left =
+		new_position_int_zero();  // The top left texture coordinate of the tile
+	PositionInt tex_coord_right =
+		new_position_int_zero();  // The bottom right texture coordinate of the tile
 
 	// initialize tile_surface to point to the pixels of the sprite's tileset
 	surface_t tile_surface = sprite_get_pixels(tiled->sprite);
