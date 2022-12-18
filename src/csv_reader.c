@@ -16,6 +16,7 @@
 			   i < total_item_count) {                                                             \
 			for (tok = strtok(buffer, ","); tok && *tok; tok = strtok(NULL, ",\n\r")) {            \
 				output_array[i] = (TYPE)atoi(tok);                                                 \
+				--output_array[i];                                                                 \
 				++i;                                                                               \
 			}                                                                                      \
 		}                                                                                          \
