@@ -1,5 +1,7 @@
 #include "../include/tiled.h"
 #include "../include/format_handling.h"
+#include "../include/csv_reader.h"
+#include "../include/memory_alloc.h"
 
 #include <string.h>
 
@@ -67,7 +69,7 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 	memset(tiled_map->map, -1, map_size.width * map_size.height);
 
 	// read map from file
-	csv_reader_from_chars(map_path, map_size.width * map_size.height, tiled_map->map);
+	csv_reader_from_ints(map_path, map_size.width * map_size.height, tiled_map->map);
 
 	return tiled_map;
 }
