@@ -65,8 +65,8 @@ Tiled *tiled_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, 
 															   map_size.height * tile_size.height));
 
 	// allocate map
-	tiled_map->map = MEM_ALLOC(map_size.width * map_size.height, memory_pool);
-	memset(tiled_map->map, -1, map_size.width * map_size.height);
+	tiled_map->map = MEM_ALLOC(sizeof(int16_t) * map_size.width * map_size.height, memory_pool);
+	memset(tiled_map->map, -1, sizeof(int16_t) * map_size.width * map_size.height);
 
 	// read map from file
 	csv_reader_from_ints(map_path, map_size.width * map_size.height, tiled_map->map);
