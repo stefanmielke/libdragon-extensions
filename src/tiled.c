@@ -118,8 +118,8 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect, Position view_position) {
 		// configure the loaded region for this tile
 		tex_coord_left.x = (tiled->map[tile] % tiled->sprite->hslices) * tex_size.width;
 		tex_coord_left.y = (tiled->map[tile] / tiled->sprite->hslices) * tex_size.height;
-		tex_coord_right.x = tex_coord_left.x + tex_size.width - 1;
-		tex_coord_right.y = tex_coord_left.y + tex_size.height - 1;
+		tex_coord_right.x = tex_coord_left.x + tex_size.width;
+		tex_coord_right.y = tex_coord_left.y + tex_size.height;
 		// load the tile region into TMEM
 		rdpq_tex_load_sub(TILE0, &tile_surface, 0, tex_coord_left.x, tex_coord_left.y,
 						  tex_coord_right.x, tex_coord_right.y);
