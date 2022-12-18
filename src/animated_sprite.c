@@ -1,3 +1,4 @@
+#include "../include/format_handling.h"
 #include "../include/animated_sprite.h"
 
 #include <math.h>
@@ -33,10 +34,23 @@ void animated_sprite_tick(AnimatedSprite *anim, float anim_rate) {
 }
 
 void animated_sprite_draw(AnimatedSprite *anim, Position pos, Rect screen_rect) {
+	format_set_render_mode(anim->sprite, false);
+
 	if (is_intersecting(new_rect(pos, anim->size), screen_rect)) {
-		rdp_sync(SYNC_PIPE);
-		rdp_load_texture_stride(0, 0, MIRROR_DISABLED, anim->sprite, anim->_current_offset);
-		rdp_draw_sprite(0, pos.x - anim->render_offset.x, pos.y - anim->render_offset.y,
-						MIRROR_DISABLED);
+		surface_t spritesheet_surface = sprite_get_pixels(anim->sprite);
+
+		int tex_width = anim->sprite->width / anim->sprite->hslices;
+		int tex_height = anim->sprite->height / anim->sprite->vslices;
+
+		int s_0 = ((int)anim->_current_offset % anim->sprite->hslices) * tex_width;
+		int t_0 = ((int)anim->_current_offset / anim->sprite->hslices) * tex_height;
+		int s_1 = s_0 + tex_width - 1;
+		int t_1 = t_0 + tex_height - 1;
+
+		rdpq_tex_load_sub(TILE0, &spritesheet_surface, 0, s_0, t_0, s_1, t_1);
+
+		rdpq_texture_rectangle(TILE0, pos.x - anim->render_offset.x, pos.y - anim->render_offset.y,
+							   pos.x - anim->render_offset.x + tex_width,
+							   pos.y - anim->render_offset.y + tex_height, s_0, t_0, 1.f, 1.f);
 	}
 }

@@ -48,8 +48,9 @@ typedef struct {
  *
  * @return The new TiledCached.
  */
-TiledCached *tiled_cached_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path,
-							   Size map_size, Size tile_size);
+__attribute__((deprecated("TiledCached is no longer actively supported"))) TiledCached *
+tiled_cached_init(MemZone *memory_pool, sprite_t *sprite, const char *map_path, Size map_size,
+				  Size tile_size);
 
 /**
  * @brief Render a Tiled map using hardware rendering. Use this method when there aren't that many
@@ -60,7 +61,8 @@ TiledCached *tiled_cached_init(MemZone *memory_pool, sprite_t *sprite, const cha
  * @param screen_rect
  *        Rect of the current screen. Used to cull tiles outside of the screen.
  */
-void tiled_cached_render(TiledCached *tiled, Rect screen_rect);
+__attribute__((deprecated("TiledCached is no longer actively supported"))) void tiled_cached_render(
+	TiledCached *tiled, Rect screen_rect);
 
 /**
  * @brief Destroy a TiledCached that didn't use a memory pool on init.
@@ -68,7 +70,8 @@ void tiled_cached_render(TiledCached *tiled, Rect screen_rect);
  * @param tiled
  *        TiledCached to destroy.
  */
-void tiled_cached_destroy(TiledCached *tiled);
+__attribute__((deprecated("TiledCached is no longer actively supported"))) void
+tiled_cached_destroy(TiledCached *tiled);
 
 #ifdef __cplusplus
 }

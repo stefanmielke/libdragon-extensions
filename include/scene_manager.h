@@ -20,7 +20,7 @@ typedef short (*fnSMTickCallback)();
 /**
  * @brief Called by scene_manager_display.
  */
-typedef void (*fnSMDisplayCallback)(display_context_t disp);
+typedef void (*fnSMDisplayCallback)(surface_t *disp);
 /**
  * @brief Called by scene_manager_tick before fnSMSceneChangeCallback.
  */
@@ -121,7 +121,7 @@ void scene_manager_tick(SceneManager *scene_manager);
  * @param[in] disp
  *            The main display context.
  */
-void scene_manager_display(SceneManager *scene_manager, display_context_t disp);
+void scene_manager_display(SceneManager *scene_manager, surface_t *disp);
 
 /**
  * @brief Frees up space allocated on the SceneManager. Should only be called if not using a

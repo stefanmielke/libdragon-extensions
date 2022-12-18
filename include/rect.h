@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 #include "position.h"
+#include "position_int.h"
+
 #include "size.h"
 
 #ifdef __cplusplus
@@ -19,6 +21,16 @@ typedef struct {
 } Rect;
 
 /**
+ * @brief Struct that has an integer position and size
+ */
+typedef struct {
+	/// Where the RectInt is
+	PositionInt pos;
+	/// Size of the RectInt
+	SizeInt size;
+} RectInt;
+
+/**
  * @brief Returns a new Rect with the position and size informed.
  *
  * @param[in] pos
@@ -27,9 +39,20 @@ typedef struct {
  *            Size of the Rect
  */
 inline Rect new_rect(Position pos, Size size) {
-	Rect rect;
-	rect.pos = pos;
-	rect.size = size;
+	Rect rect = {.pos = pos, .size = size};
+	return rect;
+}
+
+/**
+ * @brief Returns a new RectInt with the position and size informed.
+ *
+ * @param[in] pos
+ *            Position of the RectInt
+ * @param[in] size
+ *            Size of the RectInt
+ */
+inline RectInt new_rectint(PositionInt pos, SizeInt size) {
+	RectInt rect = {.pos = pos, .size = size};
 	return rect;
 }
 
