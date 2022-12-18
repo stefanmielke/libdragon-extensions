@@ -33,8 +33,6 @@
 	for (size_t y = initial_y; y < final_y; y++) {                                                 \
 		for (size_t x = initial_x; x < final_x; x++) {                                             \
 			size_t tile = (y * (int)tiled->map_size.width) + x;                                    \
-			if (tiled->map[tile] == -1)                                                            \
-				continue;                                                                          \
 			int screen_x = x * tiled->tile_size.width - screen_rect.pos.x + tiled->offset.x +      \
 						   view_position.x;                                                        \
 			int screen_y = y * tiled->tile_size.height - screen_rect.pos.y + tiled->offset.y +     \
@@ -46,7 +44,9 @@
 			}                                                                                      \
 			if (screen_actual_y < 0) {                                                             \
 				screen_actual_y = 0;                                                               \
-			}
+			}                                                                                      \
+			if (tiled->map[tile] == -1)                                                            \
+				continue;
 
 #define END_LOOP()                                                                                 \
 	}                                                                                              \
