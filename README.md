@@ -17,6 +17,7 @@ You can either [download the code from GitHub](https://github.com/stefanmielke/l
 - [Color Support](#Color-Support)
 - [Sprite Batch](#Sprite-Batch)
 - [Animated Sprite](#Animated-Sprite)
+- [CSV Reader](#CSV-Reader)
 - [Tiled Support](#Tiled-Support)
 - [Scene Manager](#Scene-Manager)
 - [Object Pooling (Free List)](#Object-Pooling-Free-List)
@@ -210,6 +211,19 @@ mem_zone_free_all(&memory_pool);
 int value2 = mem_zone_alloc(&memory_pool, sizeof(int));
 ```
 
+### CSV Reader
+> csv_reader.h
+
+Simple CSV reader to read files from DFS into arrays.
+
+```c
+int16_t output_array_ints[SIZE_OF_ARRAY];
+csv_reader_from_ints("path/to/csv_file.csv", SIZE_OF_ARRAY, output_array);
+
+char output_array_chars[SIZE_OF_ARRAY];
+csv_reader_from_chars("path/to/csv_file.csv", SIZE_OF_ARRAY, output_array);
+```
+
 ### Tiled Support
 
 
@@ -237,10 +251,10 @@ Tiled *tile_test = tiled_init(&memory_pool, tile_sprite, "/path/to/map.map", gri
 Tiled *tile_test = tiled_init(NULL, tile_sprite, "/path/to/map.map", grid_size, tile_size);
 
 // Render the map (software renderer)
-tiled_render(disp, tile_test, screen_rect);
+tiled_render(disp, tile_test, screen_rect, view_position);
 
 // Render the map (hardware renderer)
-tiled_render_rdp(tile_test, screen_rect);
+tiled_render_rdp(tile_test, screen_rect, view_position);
 
 // if not using memory pool (and only if not using), you have to call destroy to free the memory used
 tiled_destroy(tile_test);
