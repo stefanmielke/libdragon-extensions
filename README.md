@@ -260,9 +260,9 @@ tiled_render_rdp(tile_test, screen_rect, view_position);
 tiled_destroy(tile_test);
 ```
 
-> tiled_cached.h | tiled_cached.c
+> (deprecated) tiled_cached.h | tiled_cached.c
 
-This variant can perform really well even if you have more than a few different textures due to its caching, and it tries to prevent texture swaps as much as it can.
+This variant can perform really well even if you have more than a few different textures due to its caching, and it tries to prevent texture swaps as much as it can. It is no longer actively supported, but you can still use it if you really want
 
 It consumes more memory, takes more time to init, and lacks culling.
 
