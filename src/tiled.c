@@ -12,12 +12,16 @@
 		return;
 
 #define SET_VARS()                                                                                 \
-	int initial_x = (screen_rect.pos.x - tiled->offset.x) / tiled->tile_size.width;                \
-	int initial_y = (screen_rect.pos.y - tiled->offset.y) / tiled->tile_size.height;               \
-	size_t final_x = ((screen_rect.pos.x + screen_rect.size.width - tiled->offset.x) /             \
+	int initial_x = (screen_rect.pos.x - tiled->offset.x - view_position.x) /                      \
+					tiled->tile_size.width;                                                        \
+	int initial_y = (screen_rect.pos.y - tiled->offset.y - view_position.y) /                      \
+					tiled->tile_size.height;                                                       \
+	size_t final_x = ((screen_rect.pos.x + screen_rect.size.width - tiled->offset.x -              \
+					   view_position.x) /                                                          \
 					  tiled->tile_size.width) +                                                    \
 					 1;                                                                            \
-	size_t final_y = ((screen_rect.pos.y + screen_rect.size.height - tiled->offset.y) /            \
+	size_t final_y = ((screen_rect.pos.y + screen_rect.size.height - tiled->offset.y -             \
+					   view_position.y) /                                                          \
 					  tiled->tile_size.height) +                                                   \
 					 1;                                                                            \
 	if (initial_x < 0)                                                                             \
@@ -45,6 +49,7 @@
 			if (screen_actual_y < 0) {                                                             \
 				screen_actual_y = 0;                                                               \
 			}                                                                                      \
+                                                                                                   \
 			if (tiled->map[tile] == -1)                                                            \
 				continue;
 
