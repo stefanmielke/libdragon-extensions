@@ -68,6 +68,8 @@ void tiled_set_render_offset(Tiled *tiled, Position offset);
  *        Tiled to render.
  * @param screen_rect
  *        Rect of the current screen. Used to cull tiles outside of the screen.
+ * @param view_position
+ *        The viewing position to be used for scrolling
  */
 void tiled_render(surface_t *disp, Tiled *tiled, Rect screen_rect, Position view_position);
 
