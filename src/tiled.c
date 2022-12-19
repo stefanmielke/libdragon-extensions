@@ -12,10 +12,12 @@
 		return;
 
 #define SET_VARS()                                                                                 \
-	int initial_x = (screen_rect.pos.x - tiled->offset.x - view_position.x) /                      \
-					tiled->tile_size.width;                                                        \
-	int initial_y = (screen_rect.pos.y - tiled->offset.y - view_position.y) /                      \
-					tiled->tile_size.height;                                                       \
+	int scroll_offset_x = (int)view_position.x % (int)tiled->tile_size.width;                      \
+	int scroll_offset_y = (int)view_position.y % (int)tiled->tile_size.height;                     \
+                                                                                                   \
+	int initial_x = (tiled->offset.x - view_position.x) / tiled->tile_size.width;                  \
+	int initial_y = (tiled->offset.y - view_position.y) / tiled->tile_size.height;                 \
+                                                                                                   \
 	size_t final_x = ((screen_rect.pos.x + screen_rect.size.width - tiled->offset.x -              \
 					   view_position.x) /                                                          \
 					  tiled->tile_size.width) +                                                    \
@@ -24,32 +26,28 @@
 					   view_position.y) /                                                          \
 					  tiled->tile_size.height) +                                                   \
 					 1;                                                                            \
-	if (initial_x < 0)                                                                             \
-		initial_x = 0;                                                                             \
-	if (initial_y < 0)                                                                             \
-		initial_y = 0;                                                                             \
-	if (final_x > tiled->map_size.width)                                                           \
+	if (final_x >= tiled->map_size.width)                                                          \
 		final_x = tiled->map_size.width;                                                           \
-	if (final_y > tiled->map_size.height)                                                          \
+	if (final_y >= tiled->map_size.height)                                                         \
 		final_y = tiled->map_size.height;
 
 #define BEGIN_LOOP()                                                                               \
 	for (size_t y = initial_y; y < final_y; y++) {                                                 \
 		for (size_t x = initial_x; x < final_x; x++) {                                             \
 			size_t tile = (y * (int)tiled->map_size.width) + x;                                    \
-			int screen_x = x * tiled->tile_size.width - screen_rect.pos.x + tiled->offset.x +      \
-						   view_position.x;                                                        \
-			int screen_y = y * tiled->tile_size.height - screen_rect.pos.y + tiled->offset.y +     \
-						   view_position.y;                                                        \
+			int screen_x = (x - initial_x) * tiled->tile_size.width + screen_rect.pos.x +          \
+						   scroll_offset_x;                                                        \
+			int screen_y = (y - initial_y) * tiled->tile_size.height + screen_rect.pos.y +         \
+						   scroll_offset_y;                                                        \
 			int screen_actual_x = screen_x;                                                        \
 			int screen_actual_y = screen_y;                                                        \
-			if (screen_actual_x < 0) {                                                             \
-				screen_actual_x = 0;                                                               \
-			}                                                                                      \
-			if (screen_actual_y < 0) {                                                             \
-				screen_actual_y = 0;                                                               \
-			}                                                                                      \
                                                                                                    \
+			if (screen_actual_x < (tiled->offset.x + screen_rect.pos.x)) {                         \
+				screen_actual_x = tiled->offset.x + screen_rect.pos.x;                             \
+			}                                                                                      \
+			if (screen_actual_y < (tiled->offset.x + screen_rect.pos.x)) {                         \
+				screen_actual_y = tiled->offset.x + screen_rect.pos.x;                             \
+			}                                                                                      \
 			if (tiled->map[tile] == -1)                                                            \
 				continue;
 
@@ -125,6 +123,10 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect, Position view_position) {
 		tex_coord_left.y = (tiled->map[tile] / tiled->sprite->hslices) * tex_size.height;
 		tex_coord_right.x = tex_coord_left.x + tex_size.width;
 		tex_coord_right.y = tex_coord_left.y + tex_size.height;
+
+		if (tex_coord_left.x > 1023 || tex_coord_left.y > 1023 || tex_coord_right.x > 1023 ||
+			tex_coord_right.y > 1023)
+			continue;
 		// load the tile region into TMEM
 		rdpq_tex_load_sub(TILE0, &tile_surface, 0, tex_coord_left.x, tex_coord_left.y,
 						  tex_coord_right.x, tex_coord_right.y);
