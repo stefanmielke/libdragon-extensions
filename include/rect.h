@@ -37,6 +37,8 @@ typedef struct {
  *            Position of the Rect
  * @param[in] size
  *            Size of the Rect
+ *
+ * @return The new Rect
  */
 inline Rect new_rect(Position pos, Size size) {
 	Rect rect = {.pos = pos, .size = size};
@@ -50,6 +52,8 @@ inline Rect new_rect(Position pos, Size size) {
  *            Position of the RectInt
  * @param[in] size
  *            Size of the RectInt
+ *
+ * @return The new RectInt
  */
 inline RectInt new_rectint(PositionInt pos, SizeInt size) {
 	RectInt rect = {.pos = pos, .size = size};
@@ -57,11 +61,21 @@ inline RectInt new_rectint(PositionInt pos, SizeInt size) {
 }
 
 /**
- * @brief Check if rect 'a' intersects with rect 'b'.
+ * @brief Check if Rect 'a' intersects with Rect 'b'.
  *
  * @return If 'a' is intersecting 'b'.
  */
 inline bool is_intersecting(Rect a, Rect b) {
+	return a.pos.x < b.pos.x + b.size.width && a.pos.x + a.size.width > b.pos.x &&
+		   a.pos.y < b.pos.y + b.size.height && a.pos.y + a.size.height > b.pos.y;
+}
+
+/**
+ * @brief Check if RectInt 'a' intersects with RectInt 'b'.
+ *
+ * @return If 'a' is intersecting 'b'.
+ */
+inline bool is_intersecting_int(RectInt a, RectInt b) {
 	return a.pos.x < b.pos.x + b.size.width && a.pos.x + a.size.width > b.pos.x &&
 		   a.pos.y < b.pos.y + b.size.height && a.pos.y + a.size.height > b.pos.y;
 }
@@ -76,6 +90,22 @@ inline bool is_intersecting(Rect a, Rect b) {
  * @return If 'inner' is completely inside 'outer'.
  */
 inline bool contains(Rect inner, Rect outer) {
+	return inner.pos.x >= outer.pos.x &&
+		   inner.pos.x + inner.size.width <= outer.pos.x + outer.size.width &&
+		   inner.pos.y >= outer.pos.y &&
+		   inner.pos.y + inner.size.height <= outer.pos.y + outer.size.height;
+}
+
+/**
+ * @brief Check if 'inner' is completely inside 'outer'.
+ *
+ * @param[in] inner
+ *            Rectangle that should be inside.
+ * @param[in] outer
+ *            Rectangle that should contain 'inner'.
+ * @return If 'inner' is completely inside 'outer'.
+ */
+inline bool contains_int(RectInt inner, RectInt outer) {
 	return inner.pos.x >= outer.pos.x &&
 		   inner.pos.x + inner.size.width <= outer.pos.x + outer.size.width &&
 		   inner.pos.y >= outer.pos.y &&
