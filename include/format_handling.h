@@ -34,6 +34,12 @@ inline tex_format_t format_set_render_mode(sprite_t *sprite, bool mirroring) {
 			rdpq_mode_tlut(TLUT_RGBA16);
 			rdpq_tex_load_tlut(sprite_get_palette(sprite), 0, 16);
 			break;
+		case FMT_CI8:
+			if (!mirroring)
+				rdpq_set_mode_copy(true);
+			rdpq_mode_tlut(TLUT_RGBA16);
+			rdpq_tex_load_tlut(sprite_get_palette(sprite), 0, 256);
+			break;
 		case FMT_RGBA16:
 			rdpq_mode_tlut(TLUT_NONE);
 			if (!mirroring)
