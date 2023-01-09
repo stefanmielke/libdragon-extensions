@@ -18,25 +18,27 @@
 	int initial_x = (tiled->offset.x - view_position.x) / tiled->tile_size.width;                  \
 	int initial_y = (tiled->offset.y - view_position.y) / tiled->tile_size.height;                 \
                                                                                                    \
-	size_t final_x = ((screen_rect.pos.x + screen_rect.size.width - tiled->offset.x -              \
-					   view_position.x) /                                                          \
-					  tiled->tile_size.width) +                                                    \
-					 1;                                                                            \
-	size_t final_y = ((screen_rect.pos.y + screen_rect.size.height - tiled->offset.y -             \
-					   view_position.y) /                                                          \
-					  tiled->tile_size.height) +                                                   \
-					 1;                                                                            \
+	int32_t final_x = ((screen_rect.pos.x + screen_rect.size.width - tiled->offset.x -             \
+						view_position.x) /                                                         \
+					   tiled->tile_size.width) +                                                   \
+					  1;                                                                           \
+	int32_t final_y = ((screen_rect.pos.y + screen_rect.size.height - tiled->offset.y -            \
+						view_position.y) /                                                         \
+					   tiled->tile_size.height) +                                                  \
+					  1;                                                                           \
 	if (final_x >= tiled->map_size.width)                                                          \
 		final_x = tiled->map_size.width;                                                           \
 	if (final_y >= tiled->map_size.height)                                                         \
 		final_y = tiled->map_size.height;
 
 #define BEGIN_LOOP()                                                                               \
-	for (size_t y = initial_y; y < final_y; y++) {                                                 \
-		for (size_t x = initial_x; x < final_x; x++) {                                             \
-			size_t tile = (y * (int)tiled->map_size.width) + x;                                    \
-			int screen_x = (x - initial_x) * tiled->tile_size.width + screen_rect.pos.x +          \
-						   scroll_offset_x;                                                        \
+	for (int32_t y = initial_y; y < final_y; y++) {                                                \
+		for (int32_t x = initial_x; x < final_x; x++) {                                            \
+			int32_t tile = (y * (int)tiled->map_size.width) + x;                                   \
+			if (tile < 0)                                                                          \
+				continue;                                                                          \
+			int32_t screen_x = (x - initial_x) * tiled->tile_size.width + screen_rect.pos.x +      \
+							   scroll_offset_x;                                                    \
 			int screen_y = (y - initial_y) * tiled->tile_size.height + screen_rect.pos.y +         \
 						   scroll_offset_y;                                                        \
 			int screen_actual_x = screen_x;                                                        \
@@ -102,8 +104,7 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect, Position view_position) {
 	int last_tile = -1;
 
 	// The size of each tile
-	SizeInt tex_size = new_sizeint(tiled->sprite->width / tiled->sprite->hslices,
-								   tiled->sprite->height / tiled->sprite->vslices);
+	SizeInt tex_size = new_sizeint(tiled->tile_size.width, tiled->tile_size.height);
 	PositionInt tex_coord_left =
 		new_position_int_zero();  // The top left texture coordinate of the tile
 	PositionInt tex_coord_right =
