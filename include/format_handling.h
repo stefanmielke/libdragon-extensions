@@ -23,8 +23,8 @@ inline tex_format_t format_set_render_mode(sprite_t *sprite, bool mirroring) {
 
 	if (mirroring) {
 		rdpq_set_mode_standard();
-		rdpq_mode_alphacompare(ALPHACOMPARE_THRESHOLD);
-		rdpq_set_blend_color(RGBA16(0, 0, 0, 1));
+		rdpq_mode_alphacompare(SOM_ALPHACOMPARE_THRESHOLD);
+		rdpq_set_blend_color(RGBA32(0, 0, 0, 1));
 	}
 
 	switch (sprite_format) {

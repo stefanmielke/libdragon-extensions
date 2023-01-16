@@ -37,8 +37,8 @@ void sprite_batch_draw(SpriteBatch *sprite_batch, int offset, Rect screen_rect) 
 			int x_0 = rect.pos.x - sprite_batch->render_offset.x;
 			int y_0 = rect.pos.y - sprite_batch->render_offset.y;
 
-			rdpq_texture_rectangle(TILE0, x_0, y_0, x_0 + tex_width, y_0 + tex_width, s_0, t_0, 1,
-								   1);
+			rdpq_texture_rectangle_raw(TILE0, x_0, y_0, x_0 + tex_width, y_0 + tex_width, s_0, t_0,
+									   1, 1);
 		}
 	}
 }

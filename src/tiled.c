@@ -133,15 +133,15 @@ void tiled_render_rdp(Tiled *tiled, Rect screen_rect, Position view_position) {
 						  tex_coord_right.x, tex_coord_right.y);
 	}
 
-	rdpq_texture_rectangle(TILE0, screen_actual_x, screen_actual_y, screen_x + tex_size.width,
-						   screen_y + tex_size.height,
-						   tex_coord_left.x + screen_actual_x - screen_x,
-						   tex_coord_left.y + screen_actual_y - screen_y, 1, 1);
+	rdpq_texture_rectangle_raw(TILE0, screen_actual_x, screen_actual_y, screen_x + tex_size.width,
+							   screen_y + tex_size.height,
+							   tex_coord_left.x + screen_actual_x - screen_x,
+							   tex_coord_left.y + screen_actual_y - screen_y, 1, 1);
 
 	END_LOOP()
 
 	rdpq_mode_tlut(TLUT_NONE);
-	rdpq_mode_alphacompare(ALPHACOMPARE_NONE);
+	rdpq_mode_alphacompare(SOM_ALPHACOMPARE_NONE);
 }
 
 void tiled_destroy(Tiled *tiled) {
