@@ -49,8 +49,9 @@ void animated_sprite_draw(AnimatedSprite *anim, Position pos, Rect screen_rect) 
 
 		rdpq_tex_load_sub(TILE0, &spritesheet_surface, 0, s_0, t_0, s_1, t_1);
 
-		rdpq_texture_rectangle(TILE0, pos.x - anim->render_offset.x, pos.y - anim->render_offset.y,
-							   pos.x - anim->render_offset.x + tex_width,
-							   pos.y - anim->render_offset.y + tex_height, s_0, t_0, 1.f, 1.f);
+		rdpq_texture_rectangle_raw(TILE0, pos.x - anim->render_offset.x,
+								   pos.y - anim->render_offset.y,
+								   pos.x - anim->render_offset.x + tex_width,
+								   pos.y - anim->render_offset.y + tex_height, s_0, t_0, 1.f, 1.f);
 	}
 }
